@@ -1,7 +1,7 @@
 body {
     font-family: Arial;
-    background: #f5f5f5;
     padding: 20px;
+    background: #f5f5f5;
 }
 
 .container {
@@ -10,20 +10,21 @@ body {
     border-radius: 8px;
 }
 
-input,
-textarea {
+input, textarea {
     width: 100%;
+    margin: 10px 0;
     padding: 10px;
-    margin-top: 10px;
 }
 
 button {
-    margin-top: 10px;
-    padding: 10px;
     background: #005685;
     color: white;
+    padding: 10px;
     border: none;
-    cursor: pointer;
+}
+
+button:hover {
+    background: #003f63;
 }
 
 #result {
