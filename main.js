@@ -1,19 +1,21 @@
+javascript
 console.log("main.js loaded");
 
 window.onload = function () {
 
     console.log("window loaded");
 
-    document.getElementById("createBtn")
+    document
+        .getElementById("createBtn")
         .addEventListener("click", function () {
 
-        console.log("Button clicked");
+            console.log("Button clicked");
 
-        createProject();
-    });
+            createProject();
+        });
 };
 
-function getCSRF(callback) {
+function getCSRFToken(callback) {
 
     var xhr = new XMLHttpRequest();
 
@@ -23,7 +25,10 @@ function getCSRF(callback) {
         true
     );
 
-    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader(
+        "Accept",
+        "application/json"
+    );
 
     xhr.withCredentials = true;
 
@@ -31,11 +36,13 @@ function getCSRF(callback) {
 
         if (xhr.readyState === 4) {
 
+            console.log("CSRF RESPONSE");
             console.log(xhr.responseText);
 
             if (xhr.status === 200) {
 
-                var response = JSON.parse(xhr.responseText);
+                var response =
+                    JSON.parse(xhr.responseText);
 
                 callback(response.csrf.value);
             }
@@ -50,70 +57,112 @@ function createProject() {
     var name =
         document.getElementById("projectName").value;
 
-    var desc =
+    var description =
         document.getElementById("projectDescription").value;
 
-    getCSRF(function (token) {
+    getCSRFToken(function (csrfToken) {
 
-        var payload = {
-            data: [
-                {
-                    type: "Project Space",
-                    dataelements: {
-                        title: name,
-                        description: desc
-                    }
-                }
-            ]
-        };
-
-        var xhr = new XMLHttpRequest();
-
-        xhr.open(
-            "POST",
-            "/3dspace/resources/v1/modeler/projects",
-            true
+        sendCreateRequest(
+            name,
+            description,
+            csrfToken
         );
-
-        xhr.setRequestHeader(
-            "Content-Type",
-            "application/json"
-        );
-
-        xhr.setRequestHeader(
-            "Accept",
-            "application/json"
-        );
-
-        xhr.setRequestHeader(
-            "ENO_CSRF_TOKEN",
-            token
-        );
-
-        xhr.withCredentials = true;
-
-        xhr.onreadystatechange = function () {
-
-            if (xhr.readyState === 4) {
-
-                console.log(xhr.responseText);
-
-                if (xhr.status === 200 ||
-                    xhr.status === 201) {
-
-                    document.getElementById("result")
-                        .innerHTML =
-                        "Project Created Successfully";
-
-                } else {
-
-                    document.getElementById("result")
-                        .innerHTML =
-                        "Project Creation Failed";
-                }
-            }
-        };
-
-        xhr.send(JSON.stringify(payload));
     });
 }
+
+function sendCreateRequest(
+    name,
+    description,
+    csrfToken
+) {
+
+    var payload = {
+
+        data: [
+            {
+                type: "Project Space",
+
+                dataelements: {
+                    title: name,
+                    description: description
+                }
+            }
+        ]
+    };
+
+    console.log("PAYLOAD");
+    console.log(JSON.stringify(payload));
+
+    var xhr = new XMLHttpRequest();
+
+    xhr.open(
+        "POST",
+        "/3dspace/resources/v1/modeler/projects",
+        true
+    );
+
+    xhr.setRequestHeader(
+        "Content-Type",
+        "application/json"
+    );
+
+    xhr.setRequestHeader(
+        "Accept",
+        "application/json"
+    );
+
+    xhr.setRequestHeader(
+        "ENO_CSRF_TOKEN",
+        csrfToken
+    );
+
+
+
+    // CHANGE THIS VALUE
+    xhr.setRequestHeader(
+        "SecurityContext",
+        "ctx::VPLMProjectLeader.MyCompany.Common Space"
+    );
+
+
+
+    xhr.withCredentials = true;
+
+    xhr.onreadystatechange = function () {
+
+        if (xhr.readyState === 4) {
+
+            console.log("STATUS");
+            console.log(xhr.status);
+
+            console.log("RESPONSE");
+            console.log(xhr.responseText);
+
+            var result =
+                document.getElementById("result");
+
+            if (
+                xhr.status === 200 ||
+                xhr.status === 201
+            ) {
+
+                result.innerHTML =
+                    "Project Created Successfully";
+
+                result.style.color =
+                    "green";
+
+            } else {
+
+                result.innerHTML =
+                    "Project Creation Failed";
+
+                result.style.color =
+                    "red";
+            }
+        }
+    };
+
+    xhr.send(JSON.stringify(payload));
+}
+
