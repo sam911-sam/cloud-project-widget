@@ -1,34 +1,61 @@
-javascript
 console.log("main.js loaded");
 
 window.onload = function () {
 
     console.log("window loaded");
 
-    document
-        .getElementById("createBtn")
-        .addEventListener("click", function () {
+    var btn = document.getElementById("createBtn");
 
-            console.log("Button clicked");
+    if (!btn) {
+        console.log("Button not found");
+        return;
+    }
 
-            createProject();
-        });
+    btn.onclick = function () {
+        console.log("Button clicked");
+        createProject();
+    };
 };
 
-function getCSRFToken(callback) {
+function createProject() {
+
+    console.log("createProject called");
+
+    var name = document.getElementById("projectName").value;
+    var desc = document.getElementById("projectDescription").value;
+
+    console.log("Input:", name, desc);
+
+    getCSRF(function (token) {
+
+        console.log("CSRF received:", token);
+
+        var payload = {
+            data: [
+                {
+                    type: "Project Space",
+                    dataelements: {
+                        title: name,
+                        description: desc
+                    }
+                }
+            ]
+        };
+
+        sendRequest(payload, token);
+    });
+}
+
+function getCSRF(callback) {
+
+    console.log("Fetching CSRF...");
 
     var xhr = new XMLHttpRequest();
 
-    xhr.open(
-        "GET",
-        "/3dspace/resources/v1/application/CSRF",
-        true
-    );
+    // IMPORTANT: THIS ONLY WORKS INSIDE 3DEX DASHBOARD
+    xhr.open("GET", "/3dspace/resources/v1/application/CSRF", true);
 
-    xhr.setRequestHeader(
-        "Accept",
-        "application/json"
-    );
+    xhr.setRequestHeader("Accept", "application/json");
 
     xhr.withCredentials = true;
 
@@ -36,15 +63,15 @@ function getCSRFToken(callback) {
 
         if (xhr.readyState === 4) {
 
-            console.log("CSRF RESPONSE");
-            console.log(xhr.responseText);
+            console.log("CSRF status:", xhr.status);
 
             if (xhr.status === 200) {
 
-                var response =
-                    JSON.parse(xhr.responseText);
-
+                var response = JSON.parse(xhr.responseText);
                 callback(response.csrf.value);
+
+            } else {
+                console.error("CSRF failed:", xhr.responseText);
             }
         }
     };
@@ -52,79 +79,17 @@ function getCSRFToken(callback) {
     xhr.send();
 }
 
-function createProject() {
+function sendRequest(payload, token) {
 
-    var name =
-        document.getElementById("projectName").value;
-
-    var description =
-        document.getElementById("projectDescription").value;
-
-    getCSRFToken(function (csrfToken) {
-
-        sendCreateRequest(
-            name,
-            description,
-            csrfToken
-        );
-    });
-}
-
-function sendCreateRequest(
-    name,
-    description,
-    csrfToken
-) {
-
-    var payload = {
-
-        data: [
-            {
-                type: "Project Space",
-
-                dataelements: {
-                    title: name,
-                    description: description
-                }
-            }
-        ]
-    };
-
-    console.log("PAYLOAD");
-    console.log(JSON.stringify(payload));
+    console.log("Sending request...");
 
     var xhr = new XMLHttpRequest();
 
-    xhr.open(
-        "POST",
-        "/3dspace/resources/v1/modeler/projects",
-        true
-    );
+    xhr.open("POST", "/3dspace/resources/v1/modeler/projects", true);
 
-    xhr.setRequestHeader(
-        "Content-Type",
-        "application/json"
-    );
-
-    xhr.setRequestHeader(
-        "Accept",
-        "application/json"
-    );
-
-    xhr.setRequestHeader(
-        "ENO_CSRF_TOKEN",
-        csrfToken
-    );
-
-
-
-    // CHANGE THIS VALUE
-    xhr.setRequestHeader(
-        "SecurityContext",
-        "ctx::VPLMProjectLeader.MyCompany.Common Space"
-    );
-
-
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("ENO_CSRF_TOKEN", token);
 
     xhr.withCredentials = true;
 
@@ -132,37 +97,19 @@ function sendCreateRequest(
 
         if (xhr.readyState === 4) {
 
-            console.log("STATUS");
-            console.log(xhr.status);
+            console.log("Response:", xhr.status, xhr.responseText);
 
-            console.log("RESPONSE");
-            console.log(xhr.responseText);
+            var result = document.getElementById("result");
 
-            var result =
-                document.getElementById("result");
-
-            if (
-                xhr.status === 200 ||
-                xhr.status === 201
-            ) {
-
-                result.innerHTML =
-                    "Project Created Successfully";
-
-                result.style.color =
-                    "green";
-
+            if (xhr.status === 200 || xhr.status === 201) {
+                result.innerText = "Project Created Successfully";
+                result.style.color = "green";
             } else {
-
-                result.innerHTML =
-                    "Project Creation Failed";
-
-                result.style.color =
-                    "red";
+                result.innerText = "Project Creation Failed";
+                result.style.color = "red";
             }
         }
     };
 
     xhr.send(JSON.stringify(payload));
 }
-
