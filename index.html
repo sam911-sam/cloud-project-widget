@@ -1,77 +1,16 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<!-- Copyright 2014 , Dassault Systemes. All rights reserved. -->
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:widget="http://www.netvibes.com/ns/">
+<!DOCTYPE html>
+<html>
 <head>
-
-<!-- Widget Meta Data -->
-<meta name="author" content="Dassault Systemes" />
-<meta name="brand" content="ENOVIA" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="autoRefresh" content="0" />
-<meta name="debugMode" content="true" />
-<meta name="description" content="DROP  Event" />
-
-<!-- Application Standalone emulation files -->
-<link rel="stylesheet" type="text/css" href="http://uwa.netvibes.com/lib/c/UWA/assets/css/standalone.css" />
-<link rel="stylesheet" type="text/css" href="style.css" />
-<script type="text/javascript" src="http://uwa.netvibes.com/lib/c/UWA/js/UWA_Standalone_Alone.js"></script>
-
-<!-- Other Scripts 
-<script type="text/javascript" src="../../common/scripts/jquery-1.9.1.js"></script> -->
-
-<!-- Widget Title -->
-<title>Drop Test</title>
-
-<!-- Widget Events -->
-<script language="Javascript">
-require(["UWA/Drivers/jQuery", "DS/WAFData/WAFData", "DS/i3DXCompassServices/i3DXCompassServices"], 
-function ($, WAFData, i3DXCompassServices) {
- 
-    var MyWidget = {
-        onLoad: function () {
-            alert("Onload");
-         //   console.log(MyWidget.Createfunctions());
- 
-            var bodyHtml = widget.body.innerHTML;
-            bodyHtml += "<div>Object Details:<br/><br/>" +
-                        "<form name='createform' id='createform'>" +
-                        "<label>Part Name: </label>" +
-                        "<input type='text' placeholder='Enter Part Name' name='username' required>" +
-                        "<br><br><button type='submit'>Done</button>" +
-                        "</form></div>";
- 
-            widget.body.innerHTML = bodyHtml;
- 
-            // Bind the onsubmit function using JavaScript
-            var form = document.getElementById('createform');
-            form.onsubmit = function (event) {
-                event.preventDefault(); // Prevent default form submission behavior
-				
-				var username = document.getElementById("createform").elements["username"].value;
-    alert("Username: " + username);
-	
-	
-	if (!username) {
-            alert("Please enter a username.");
-            return; // Don't proceed if no username is entered
-        }
-		else{
-		console.log("Username submitted: ", username);
-                alert("Username");
-			}	
-            };
-        },
- 
-        onRefresh: function () {
-            widget.setBody('This is first widget..onRefresh.');
-        },
-	
-    };
- 
-    widget.addEvent('onLoad', MyWidget.onLoad);
-    widget.addEvent('onRefresh', MyWidget.onRefresh);
-});
-</script>
+    <title>Test Widget</title>
 </head>
+<body>
 
+<h2>Widget Test</h2>
+
+<script>
+alert("SCRIPT RUNNING");
+console.log("SCRIPT RUNNING");
+</script>
+
+</body>
 </html>
