@@ -1,20 +1,22 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-
-    <title>Project Dashboard</title>
-
-    <link rel="stylesheet" href="style.css">
-
-    <script src="main.js"></script>
+<meta charset="utf-8">
+<title>Test Widget</title>
 </head>
-
 <body>
 
-<div id="content">
-    Loading...
-</div>
+<div id="content">Initializing...</div>
+
+<script>
+if (typeof widget !== "undefined") {
+    document.getElementById("content").innerHTML =
+        "Widget object found";
+} else {
+    document.getElementById("content").innerHTML =
+        "Widget object NOT found";
+}
+</script>
 
 </body>
 </html>
