@@ -9,7 +9,7 @@ function (WAFData) {
         console.log("Widget Loaded");
 
         widget.body.innerHTML =
-            "<h3>Widget Loaded Successfully!!!</h3>";
+            "<h3>Widget Loaded Successfully</h3>";
 
     });
 
