@@ -1,8 +1,8 @@
-document.addEventListener(
-    "DOMContentLoaded",
-    function ()
-    {
-        document.getElementById("content").innerHTML =
-            "<h3>Widget Loaded Successfully</h3>";
-    }
-);
+console.log("main.js loaded");
+
+window.onload = function () {
+
+    document.body.innerHTML =
+        "<h1>Hello from Widget</h1>";
+
+};
