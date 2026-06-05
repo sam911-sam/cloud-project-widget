@@ -1,33 +1,23 @@
-body {
-    font-family: Arial;
-    padding: 20px;
-    background: #f5f5f5;
+body
+{
+    font-family: Arial, sans-serif;
+    margin: 10px;
 }
 
-.container {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-}
-
-input, textarea {
+table
+{
     width: 100%;
-    margin: 10px 0;
-    padding: 10px;
+    border-collapse: collapse;
 }
 
-button {
-    background: #005685;
+th
+{
+    background-color: #005686;
     color: white;
-    padding: 10px;
-    border: none;
 }
 
-button:hover {
-    background: #003f63;
-}
-
-#result {
-    margin-top: 10px;
-    font-weight: bold;
+th, td
+{
+    border: 1px solid #ccc;
+    padding: 6px;
 }
