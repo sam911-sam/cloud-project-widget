@@ -3,7 +3,7 @@ console.log("main.js loaded");
 
 window.onload = function () {
 
-    console.log("window loaded--");
+    console.log("window loaded");
 
     document
         .getElementById("createBtn")
