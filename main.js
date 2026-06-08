@@ -1,23 +1,59 @@
-console.log("SCRIPT RUNNING");
+require([
+    "DS/WAFData/WAFData"
+], function (WAFData) {
 
-document
-    .getElementById("createBtn")
-    .addEventListener("click", function () {
+    document.getElementById("createBtn").addEventListener("click", function () {
 
-        const projectName =
-            document.getElementById("projectName").value;
+        const projectName = document.getElementById("projectName").value;
+        const description = document.getElementById("description").value;
 
-        const description =
-            document.getElementById("description").value;
+        // 🔴 IMPORTANT: Get platform context
+        const securityContext = widget.getValue("ctx"); // sometimes "ctx" or "SecurityContext"
+        const csrfToken = widget.getValue("ENO_CSRF_TOKEN");
 
-        const result =
-            document.getElementById("result");
+        // 🔵 API URL (replace with your real endpoint)
+        const url = "/resources/v1/modeler/samples";
 
-        result.style.display = "block";
+        // 🔵 Payload as per your API spec
+        const payload = {
+            data: [
+                {
+                    type: "string",
+                    dataelements: {
+                        name: projectName,
+                        description: description
+                    }
+                }
+            ]
+        };
 
-        result.innerHTML = `
-            <h3>Project Created</h3>
-            <p><strong>Project Name:</strong> ${projectName}</p>
-            <p><strong>Description:</strong> ${description}</p>
-        `;
+        WAFData.authenticatedRequest(url, {
+            method: "POST",
+            type: "json",
+
+            headers: {
+                "SecurityContext": securityContext,
+                "ENO_CSRF_TOKEN": csrfToken,
+                "Accept-Language": "en"
+            },
+
+            data: JSON.stringify(payload),
+
+            onComplete: function (response) {
+                console.log("SUCCESS:", response);
+
+                document.getElementById("result").style.display = "block";
+                document.getElementById("result").innerHTML =
+                    "<b>Project Created Successfully</b><br>" +
+                    "Name: " + projectName + "<br>" +
+                    "Description: " + description;
+            },
+
+            onFailure: function (error) {
+                console.error("FAILED:", error);
+            }
+        });
+
     });
+
+});
