@@ -1,81 +1,23 @@
-console.log("main.js loaded");
+console.log("SCRIPT RUNNING");
 
-const BASE_URL = "https://r1132101321030-eu1-ifwe.3dexperience.3ds.com";
+document
+    .getElementById("createBtn")
+    .addEventListener("click", function () {
 
-window.onload = function () {
-    console.log("onLoad triggered");
+        const projectName =
+            document.getElementById("projectName").value;
 
-    var btn = document.getElementById("createBtn");
+        const description =
+            document.getElementById("description").value;
 
-    btn.onclick = function () {
-        console.log("CLICK EVENT FIRED");
-        createProject();
-    };
-};
+        const result =
+            document.getElementById("result");
 
-function getCSRF(callback) {
-    var xhr = new XMLHttpRequest();
+        result.style.display = "block";
 
-    xhr.open("GET", BASE_URL + "/3dspace/resources/v1/application/CSRF", true);
-
-    xhr.setRequestHeader("Accept", "application/json");
-    xhr.withCredentials = true;
-
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            console.log("CSRF status:", xhr.status);
-            console.log(xhr.responseText);
-
-            if (xhr.status === 200) {
-                var response = JSON.parse(xhr.responseText);
-                callback(response.csrf.value);
-            } else {
-                console.error("CSRF failed");
-            }
-        }
-    };
-
-    xhr.send();
-}
-
-function createProject() {
-    var name = document.getElementById("projectName").value;
-    var desc = document.getElementById("projectDescription").value;
-
-    console.log("Input:", name, desc);
-
-    getCSRF(function (token) {
-
-        var payload = {
-            data: [{
-                type: "Project Space",
-                dataelements: {
-                    title: name,
-                    description: desc
-                }
-            }]
-        };
-
-        sendRequest(payload, token);
+        result.innerHTML = `
+            <h3>Project Created</h3>
+            <p><strong>Project Name:</strong> ${projectName}</p>
+            <p><strong>Description:</strong> ${description}</p>
+        `;
     });
-}
-
-function sendRequest(payload, token) {
-    var xhr = new XMLHttpRequest();
-
-    xhr.open("POST", BASE_URL + "/3dspace/resources/v1/modeler/projects", true);
-
-    xhr.setRequestHeader("Content-Type", "application/json");
-    xhr.setRequestHeader("Accept", "application/json");
-    xhr.setRequestHeader("ENO_CSRF_TOKEN", token);
-
-    xhr.withCredentials = true;
-
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-            console.log(xhr.status, xhr.responseText);
-        }
-    };
-
-    xhr.send(JSON.stringify(payload));
-}
