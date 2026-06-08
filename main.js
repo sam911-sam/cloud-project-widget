@@ -1,7 +1,4 @@
-define(function () {
+console.log("SCRIPT RUNNING");
 
-    console.log("Widget Loaded");
-
-    document.body.innerHTML += "<h3>Widget Loaded Successfully</h3>";
-
-});
+document.getElementById("content").innerHTML =
+    "<h3>Main.js Loaded Successfully</h3>";
