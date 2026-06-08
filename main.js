@@ -1,59 +1,140 @@
-require([
-    "DS/WAFData/WAFData"
-], function (WAFData) {
+console.log("main.js loaded");
 
-    document.getElementById("createBtn").addEventListener("click", function () {
+window.onload = function () {
 
-        const projectName = document.getElementById("projectName").value;
-        const description = document.getElementById("description").value;
+    console.log("onLoad triggered");
 
-        // 🔴 IMPORTANT: Get platform context
-        const securityContext = widget.getValue("ctx"); // sometimes "ctx" or "SecurityContext"
-        const csrfToken = widget.getValue("ENO_CSRF_TOKEN");
+    var btn = document.getElementById("createBtn");
 
-        // 🔵 API URL (replace with your real endpoint)
-        const url = "/resources/v1/modeler/samples";
+    btn.onclick = function () {
+        console.log("CLICK EVENT FIRED");
+        createProject();
+    };
 
-        // 🔵 Payload as per your API spec
-        const payload = {
+    console.log("Button event attached successfully");
+};
+
+
+// --------------------
+// 1. GET CSRF TOKEN
+// --------------------
+function getCSRF(callback) {
+
+    var xhr = new XMLHttpRequest();
+
+    xhr.open("GET", "/3dspace/resources/v1/application/CSRF", true);
+
+    xhr.setRequestHeader("Accept", "application/json");
+
+    xhr.withCredentials = true;
+
+    xhr.onreadystatechange = function () {
+
+        if (xhr.readyState === 4) {
+
+            console.log("CSRF status:", xhr.status);
+            console.log("CSRF response:", xhr.responseText);
+
+            if (xhr.status === 200) {
+
+                try {
+                    var response = JSON.parse(xhr.responseText);
+
+                    var token = response.csrf.value;
+
+                    console.log("CSRF TOKEN:", token);
+
+                    callback(token);
+
+                } catch (e) {
+                    console.error("CSRF parse error", e);
+                }
+
+            } else {
+                console.error("CSRF request failed");
+            }
+        }
+    };
+
+    xhr.send();
+}
+
+
+// --------------------
+// 2. CREATE PROJECT
+// --------------------
+function createProject() {
+
+    console.log("Create Project clicked");
+
+    var name = document.getElementById("projectName").value;
+    var desc = document.getElementById("projectDescription").value;
+
+    console.log("Input:", name, desc);
+
+    getCSRF(function (csrfToken) {
+
+        var payload = {
             data: [
                 {
-                    type: "string",
+                    type: "Project Space",   // IMPORTANT: must match backend
                     dataelements: {
-                        name: projectName,
-                        description: description
+                        title: name,
+                        description: desc
                     }
                 }
             ]
         };
 
-        WAFData.authenticatedRequest(url, {
-            method: "POST",
-            type: "json",
+        console.log("Payload:", JSON.stringify(payload, null, 2));
 
-            headers: {
-                "SecurityContext": securityContext,
-                "ENO_CSRF_TOKEN": csrfToken,
-                "Accept-Language": "en"
-            },
-
-            data: JSON.stringify(payload),
-
-            onComplete: function (response) {
-                console.log("SUCCESS:", response);
-
-                document.getElementById("result").style.display = "block";
-                document.getElementById("result").innerHTML =
-                    "<b>Project Created Successfully</b><br>" +
-                    "Name: " + projectName + "<br>" +
-                    "Description: " + description;
-            },
-
-            onFailure: function (error) {
-                console.error("FAILED:", error);
-            }
-        });
-
+        sendRequest(payload, csrfToken);
     });
+}
 
-});
+
+// --------------------
+// 3. SEND API REQUEST
+// --------------------
+function sendRequest(payload, csrfToken) {
+
+    var xhr = new XMLHttpRequest();
+
+    var baseUrl = "/3dspace";
+
+    xhr.open(
+        "POST",
+        baseUrl + "/resources/v1/modeler/projects", //  confirm this endpoint in your system
+        true
+    );
+
+    xhr.setRequestHeader("Content-Type", "application/json");
+    xhr.setRequestHeader("Accept", "application/json");
+    xhr.setRequestHeader("ENO_CSRF_TOKEN", csrfToken);
+
+    xhr.withCredentials = true;
+
+    xhr.onreadystatechange = function () {
+
+        if (xhr.readyState === 4) {
+
+            console.log("HTTP Status:", xhr.status);
+            console.log("Response:", xhr.responseText);
+
+            var resultDiv = document.getElementById("result");
+
+            if (xhr.status === 200 || xhr.status === 201) {
+
+                resultDiv.innerHTML = "Project created successfully";
+                resultDiv.style.color = "green";
+
+            } else {
+
+                resultDiv.innerHTML = "Project creation failed";
+                resultDiv.style.color = "red";
+            }
+        }
+    };
+
+    xhr.send(JSON.stringify(payload));
+}
