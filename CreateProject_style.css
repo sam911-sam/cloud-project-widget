@@ -1,0 +1,31 @@
+body{
+    font-family: Arial, sans-serif;
+    padding: 15px;
+}
+
+.container{
+    width:100%;
+}
+
+input,
+textarea{
+    width:100%;
+    margin-top:8px;
+    margin-bottom:10px;
+    padding:8px;
+    box-sizing:border-box;
+}
+
+textarea{
+    height:80px;
+}
+
+button{
+    padding:8px 15px;
+    cursor:pointer;
+}
+
+#result{
+    margin-top:15px;
+    font-weight:bold;
+}
