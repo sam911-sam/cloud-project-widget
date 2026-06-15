@@ -14,23 +14,32 @@
 
         console.log("Widget Loaded");
 
-         widget.body.innerHTML ='<div class="dxp-container">' +'<div class="dxp-header">Create Project Space</div>' +
-            '<div class="dxp-form">' + '<div class="dxp-field">' +
-                '<label>Project Name</label>' +
-                '<input id="projectName" placeholder="Enter project name">' +
-            '</div>' +
-            '<div class="dxp-field">' +
-                '<label>Description</label>' +
-                '<input id="projectDescription" placeholder="Enter description">' +
-            '</div>' +
-            '<div class="dxp-actions">' +
-                '<button id="createBtn">Create Project</button>' +
-            '</div>' +
-            '<div id="result"></div>' +
-        '</div>' +
-    '</div>';
-
+             widget.body.innerHTML =
+                '<div class="dxp-container">' +
+                    '<div class="dxp-header">Create Project Space</div>' +
+                    '<div class="dxp-form">' +
+        
+                        '<div class="dxp-field">' +
+                            '<label>Project Name</label>' +
+                            '<input id="projectName" placeholder="Enter project name">' +
+                        '</div>' +
+        
+                        '<div class="dxp-field">' +
+                            '<label>Description</label>' +
+                            '<input id="projectDescription" placeholder="Enter description">' +
+                        '</div>' +
+        
+                        '<div class="dxp-actions">' +
+                            '<button id="createBtn">Create Project</button>' +
+                        '</div>' +
+        
+                        '<div id="result"></div>' +
+        
+                    '</div>' +
+                '</div>';
+        
             document.getElementById("createBtn").onclick = createProject;
+        
         });
     }
 
