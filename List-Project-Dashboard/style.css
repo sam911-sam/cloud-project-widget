@@ -1,0 +1,42 @@
+body {
+    font-family: Segoe UI, Arial;
+    background: #f5f6f8;
+    padding: 10px;
+}
+
+.header {
+    background: white;
+    padding: 10px;
+    border-left: 4px solid #0076ff;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.table th {
+    background: #f0f2f5;
+    text-align: left;
+    padding: 10px;
+    font-size: 13px;
+}
+
+.table td {
+    padding: 10px;
+    border-top: 1px solid #eee;
+    font-size: 13px;
+}
+
+.status-active {
+    color: green;
+    font-weight: bold;
+}
+
+.status-inactive {
+    color: red;
+    font-weight: bold;
+}
