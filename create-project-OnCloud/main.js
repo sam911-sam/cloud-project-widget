@@ -16,7 +16,7 @@
 
          widget.body.innerHTML ='<div class="dxp-container">' +'<div class="dxp-header">Create Project Space</div>' +
             '<div class="dxp-form">' + '<div class="dxp-field">' +
-                <label>Project Name</label>' +
+                '<label>Project Name</label>' +
                 '<input id="projectName" placeholder="Enter project name">' +
             '</div>' +
             '<div class="dxp-field">' +
