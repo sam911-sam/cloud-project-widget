@@ -35,18 +35,22 @@ function loadProjects() {
 
                     var spaceUrl = services["3DSpace"];
 
-                    var url = spaceUrl + "/resources/v1/modeler/projects";
+                    var url =
+                        spaceUrl +
+                        "/resources/v1/modeler/projects";
 
                     WAFData.authenticatedRequest(url, {
+
                         method: "GET",
                         type: "json",
 
                         onComplete: function (res) {
 
-                            renderTable(res.data || []);
+                            renderTable(res.data || [], spaceUrl);
                         },
 
                         onFailure: function () {
+
                             document.getElementById("tableContainer")
                                 .innerHTML = "Failed to load projects";
                         }
@@ -57,7 +61,7 @@ function loadProjects() {
     );
 }
 
-function renderTable(data) {
+function renderTable(data, spaceUrl) {
 
     if (!data.length) {
         document.getElementById("tableContainer").innerHTML =
@@ -77,6 +81,9 @@ function renderTable(data) {
 
         var p = data[i].dataelements;
 
+        var projectId =
+            data[i].id || data[i].physicalid;
+
         var statusClass =
             (p.state === "Active")
                 ? "status-active"
@@ -84,15 +91,53 @@ function renderTable(data) {
 
         html +=
             '<tr>' +
-                '<td>' + (p.title || "") + '</td>' +
+
+                '<td>' +
+                    '<a href="#" class="project-link" data-id="' + projectId + '">' +
+                        (p.title || "") +
+                    '</a>' +
+                '</td>' +
+
                 '<td>' + (p.description || "") + '</td>' +
+
                 '<td class="' + statusClass + '">' +
                     (p.state || "Unknown") +
                 '</td>' +
+
             '</tr>';
     }
 
     html += '</table>';
 
     document.getElementById("tableContainer").innerHTML = html;
+
+    attachClick(spaceUrl);
+}
+
+function attachClick(spaceUrl) {
+
+    var links = document.getElementsByClassName("project-link");
+
+    for (var i = 0; i < links.length; i++) {
+
+        links[i].onclick = function (e) {
+
+            e.preventDefault();
+
+            var projectId =
+                this.getAttribute("data-id");
+
+            openProject(projectId, spaceUrl);
+        };
+    }
+}
+
+function openProject(projectId, spaceUrl) {
+
+    var url =
+        spaceUrl +
+        "/common/emdm.jsp?objectId=" +
+        projectId;
+
+    window.open(url, "_blank");
 }
