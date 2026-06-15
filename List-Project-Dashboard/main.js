@@ -10,7 +10,7 @@
         widget.addEvent("onLoad", function () {
 
             widget.body.innerHTML =
-                '<div class="header">Project Dashboard</div>' +
+                '<div class="header">Project Status</div>' +
                 '<div id="tableContainer">Loading projects...</div>';
 
             loadProjects();
@@ -20,6 +20,8 @@
     init();
 
 })();
+
+/* ---------------- LOAD PROJECTS ---------------- */
 
 function loadProjects() {
 
@@ -52,7 +54,8 @@ function loadProjects() {
                         onFailure: function () {
 
                             document.getElementById("tableContainer")
-                                .innerHTML = "Failed to load projects";
+                                .innerHTML =
+                                "<div style='color:red'>Failed to load projects</div>";
                         }
                     });
                 }
@@ -60,6 +63,8 @@ function loadProjects() {
         }
     );
 }
+
+/* ---------------- RENDER TABLE ---------------- */
 
 function renderTable(data, spaceUrl) {
 
@@ -81,8 +86,10 @@ function renderTable(data, spaceUrl) {
 
         var p = data[i].dataelements;
 
+        /* IMPORTANT: use physicalid/id */
         var projectId =
-            data[i].id || data[i].physicalid;
+            data[i].physicalid ||
+            data[i].id;
 
         var statusClass =
             (p.state === "Active")
@@ -92,13 +99,14 @@ function renderTable(data, spaceUrl) {
         html +=
             '<tr>' +
 
+                /* CLICKABLE PROJECT NAME */
                 '<td>' +
                     '<a href="#" class="project-link" data-id="' + projectId + '">' +
-                        (p.title || "") +
+                        (p.title || "Unnamed Project") +
                     '</a>' +
                 '</td>' +
 
-                '<td>' + (p.description || "") + '</td>' +
+                '<td>' + (p.description || "-") + '</td>' +
 
                 '<td class="' + statusClass + '">' +
                     (p.state || "Unknown") +
@@ -113,6 +121,8 @@ function renderTable(data, spaceUrl) {
 
     attachClick(spaceUrl);
 }
+
+/* ---------------- CLICK HANDLER ---------------- */
 
 function attachClick(spaceUrl) {
 
@@ -132,12 +142,16 @@ function attachClick(spaceUrl) {
     }
 }
 
+/* ---------------- OPEN PROJECT ---------------- */
+
 function openProject(projectId, spaceUrl) {
 
+    /* CORRECT ENOVIA URL (based on your system) */
     var url =
         spaceUrl +
-        "/common/emdm.jsp?objectId=" +
-        projectId;
+        "/enovia/common/emxNavigator.jsp" +
+        "?appName=ENOBUPS_AP" +
+        "&objectId=" + projectId;
 
     window.open(url, "_blank");
 }
