@@ -1,19 +1,33 @@
-widget.addEvent("onLoad", function () {
+(function () {
 
-    console.log("Widget Loaded");
+    function waitForWidget() {
 
-    widget.body.innerHTML =
-        '<h3>Create Project Space</h3>' +
-        '<input id="projectName" placeholder="Project Name"><br>' +
-        '<input id="projectDescription" placeholder="Description"><br>' +
-        '<button id="createBtn">Create Project</button>' +
-        '<div id="result"></div>';
+        if (typeof widget === "undefined") {
+            console.log("Waiting for widget object...");
+            setTimeout(waitForWidget, 500);
+            return;
+        }
 
-    setTimeout(function () {
-        document.getElementById("createBtn").onclick = createProject;
-    }, 500);
+        console.log("Widget object found");
 
-});
+        widget.addEvent("onLoad", function () {
+
+            console.log("Widget Loaded");
+
+            widget.body.innerHTML =
+                '<h3>Create Project Space</h3>' +
+                '<input id="projectName" placeholder="Project Name"><br>' +
+                '<input id="projectDescription" placeholder="Description"><br>' +
+                '<button id="createBtn">Create Project</button>' +
+                '<div id="result"></div>';
+
+            document.getElementById("createBtn").onclick = createProject;
+        });
+    }
+
+    waitForWidget();
+
+})();
 
 function createProject() {
 
@@ -42,10 +56,10 @@ function createProject() {
 
                     var spaceUrl = services["3DSpace"];
 
-                    console.log("3DSpace URL:");
-                    console.log(spaceUrl);
+                    console.log("3DSpace URL:", spaceUrl);
 
-                    var csrfUrl = spaceUrl + "/resources/v1/application/CSRF";
+                    var csrfUrl =
+                        spaceUrl + "/resources/v1/application/CSRF";
 
                     WAFData.authenticatedRequest(
                         csrfUrl,
@@ -57,7 +71,8 @@ function createProject() {
 
                                 console.log("CSRF SUCCESS");
 
-                                var csrfToken = csrfResponse.csrf.value;
+                                var csrfToken =
+                                    csrfResponse.csrf.value;
 
                                 createProjectRequest(
                                     WAFData,
@@ -72,25 +87,20 @@ function createProject() {
                                 console.log(error);
 
                                 document.getElementById("result").innerHTML =
-                                    "CSRF FAILED";
+                                    "<span style='color:red'>CSRF FAILED</span>";
                             }
                         }
                     );
-
                 },
 
                 onFailure: function (error) {
 
                     console.log("SERVICE DISCOVERY FAILED");
                     console.log(error);
-
                 }
-
             });
-
         }
     );
-
 }
 
 function createProjectRequest(
@@ -110,6 +120,9 @@ function createProjectRequest(
             }
         ]
     };
+
+    console.log("Payload:");
+    console.log(JSON.stringify(payload, null, 2));
 
     var projectUrl =
         spaceUrl + "/resources/v1/modeler/projects";
@@ -134,8 +147,7 @@ function createProjectRequest(
                 console.log(response);
 
                 document.getElementById("result").innerHTML =
-                    "<b style='color:green'>Project Created Successfully</b>";
-
+                    "<span style='color:green'>Project Created Successfully</span>";
             },
 
             onFailure: function (error) {
@@ -144,8 +156,7 @@ function createProjectRequest(
                 console.log(error);
 
                 document.getElementById("result").innerHTML =
-                    "PROJECT FAILED";
-
+                    "<span style='color:red'>PROJECT FAILED</span>";
             }
         }
     );
