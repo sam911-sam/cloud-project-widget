@@ -4,71 +4,76 @@ body {
     padding: 10px;
 }
 
-/* HEADER */
+/* HEADER - OOTB STRONG STYLE */
 .header {
     background: #ffffff;
-    padding: 12px 14px;
-    border-left: 4px solid #368ec4;
-    font-weight: 600;
-    font-size: 14px;
+    padding: 14px 16px;
+    border-left: 5px solid #368ec4;
+    font-size: 16px;
+    font-weight: 700;   /* bold header */
+    color: #1f1f1f;
     margin-bottom: 12px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
-    color: #333;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    letter-spacing: 0.3px;
 }
 
-/* TABLE */
+/* TABLE CONTAINER */
 .table {
     width: 100%;
     border-collapse: collapse;
     background: white;
-    border-radius: 4px;
+    border-radius: 6px;
     overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.10);
 }
 
-/* HEADER ROW */
+/* TABLE HEADER */
 .table th {
-    background: #f4f6f8;
+    background: #f3f5f7;
     text-align: left;
     padding: 12px;
     font-size: 12px;
-    color: #555;
+    font-weight: 600;
+    color: #666;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
     border-bottom: 1px solid #e1e4e8;
 }
 
-/* CELLS */
+/* TABLE ROW */
 .table td {
     padding: 12px;
-    border-top: 1px solid #eee;
     font-size: 13px;
     color: #333;
+    border-top: 1px solid #eee;
 }
 
-/* ROW HOVER */
+/* ROW HOVER (OOTB FEEL) */
 .table tr:hover {
-    background: #f0f7ff;
+    background: #eef6ff;
 }
 
-/* PROJECT LINK */
+/* PROJECT NAME LINK */
 .project-link {
-    color: #0076ff;
+    color: #333;
     text-decoration: none;
     font-weight: 500;
+    transition: 0.2s;
 }
 
+/* HOVER BLUE EFFECT (YOUR REQUEST) */
 .project-link:hover {
+    color: #0076ff;
     text-decoration: underline;
 }
 
-/* STATUS */
+/* STATUS ACTIVE (GREEN) */
 .status-active {
-    color: #2e7d32;
-    font-weight: 600;
+    color: #1e7d32;
+    font-weight: 700;
 }
 
+/* STATUS INACTIVE */
 .status-inactive {
     color: #c62828;
-    font-weight: 600;
+    font-weight: 700;
 }
