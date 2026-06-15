@@ -1,192 +1,151 @@
-console.log("Widget Loaded");
+widget.addEvent("onLoad", function () {
 
-window.onload = function () {
+    console.log("Widget Loaded");
 
-    document
-        .getElementById("createBtn")
-        .onclick = createProject;
-};
+    widget.body.innerHTML =
+        '<h3>Create Project Space</h3>' +
+        '<input id="projectName" placeholder="Project Name"><br>' +
+        '<input id="projectDescription" placeholder="Description"><br>' +
+        '<button id="createBtn">Create Project</button>' +
+        '<div id="result"></div>';
+
+    setTimeout(function () {
+        document.getElementById("createBtn").onclick = createProject;
+    }, 500);
+
+});
 
 function createProject() {
 
     console.log("Create Project Clicked");
 
-    var projectName =
-        document.getElementById("projectName").value;
+    require(
+        [
+            "DS/WAFData/WAFData",
+            "DS/i3DXCompassServices/i3DXCompassServices"
+        ],
+        function (
+            WAFData,
+            CompassServices
+        ) {
 
-    var projectDescription =
-        document.getElementById("projectDescription").value;
+            console.log("Modules Loaded");
 
-    require([
-        "DS/WAFData/WAFData",
-        "DS/PlatformAPI/PlatformAPI"
-    ], function (WAFData, PlatformAPI) {
+            CompassServices.getPlatformServices({
 
-        console.log("Modules Loaded");
+                platformId: widget.getValue("x3dPlatformId"),
 
-        PlatformAPI.getAllApplicationConfigurations({
+                onComplete: function (services) {
 
-            onSuccess: function (services) {
+                    console.log("Services Received");
+                    console.log(services);
 
-                console.log("Services Received");
-                console.log(services);
+                    var spaceUrl = services["3DSpace"];
 
-                var spaceUrl =
-                    services["3DSpace"] ||
-                    services["3dspace"];
+                    console.log("3DSpace URL:");
+                    console.log(spaceUrl);
 
-                var csrfUrl =
-                    spaceUrl +
-                    "/resources/v1/application/CSRF";
+                    var csrfUrl = spaceUrl + "/resources/v1/application/CSRF";
 
-                WAFData.authenticatedRequest(
-                    csrfUrl,
-                    {
-                        method: "GET",
+                    WAFData.authenticatedRequest(
+                        csrfUrl,
+                        {
+                            method: "GET",
+                            type: "json",
 
-                        onComplete: function (csrfResponse) {
+                            onComplete: function (csrfResponse) {
 
-                            var csrfToken =
-                                csrfResponse.csrf.value;
+                                console.log("CSRF SUCCESS");
 
-                            console.log(
-                                "CSRF TOKEN:",
-                                csrfToken
-                            );
+                                var csrfToken = csrfResponse.csrf.value;
 
-                            createProjectObject(
-                                WAFData,
-                                spaceUrl,
-                                csrfToken,
-                                projectName,
-                                projectDescription
-                            );
-                        },
+                                createProjectRequest(
+                                    WAFData,
+                                    spaceUrl,
+                                    csrfToken
+                                );
+                            },
 
-                        onFailure: function (error) {
+                            onFailure: function (error) {
 
-                            console.log(error);
+                                console.log("CSRF FAILED");
+                                console.log(error);
 
-                            document
-                                .getElementById("result")
-                                .innerHTML =
-                                "Failed to get CSRF";
+                                document.getElementById("result").innerHTML =
+                                    "CSRF FAILED";
+                            }
                         }
-                    }
-                );
-            }
-        });
-    });
+                    );
+
+                },
+
+                onFailure: function (error) {
+
+                    console.log("SERVICE DISCOVERY FAILED");
+                    console.log(error);
+
+                }
+
+            });
+
+        }
+    );
+
 }
 
-function createProjectObject(
+function createProjectRequest(
     WAFData,
     spaceUrl,
-    csrfToken,
-    projectName,
-    projectDescription
+    csrfToken
 ) {
 
     var payload = {
-
         data: [
             {
                 type: "Project Space",
-
                 dataelements: {
-
-                    title: projectName,
-
-                    description:
-                        projectDescription
+                    title: document.getElementById("projectName").value,
+                    description: document.getElementById("projectDescription").value
                 }
             }
         ]
     };
 
-    console.log("PAYLOAD");
-    console.log(payload);
-
     var projectUrl =
-        spaceUrl +
-        "/resources/v1/modeler/projects";
+        spaceUrl + "/resources/v1/modeler/projects";
 
     WAFData.authenticatedRequest(
         projectUrl,
         {
             method: "POST",
+            type: "json",
 
             headers: {
-
-                "ENO_CSRF_TOKEN":
-                    csrfToken,
-
-                "Content-Type":
-                    "application/json"
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+                "ENO_CSRF_TOKEN": csrfToken
             },
 
-            data:
-                JSON.stringify(payload),
+            data: JSON.stringify(payload),
 
-            onComplete: function (
-                response
-            ) {
+            onComplete: function (response) {
 
-                console.log(
-                    "PROJECT CREATED"
-                );
+                console.log("PROJECT CREATED");
+                console.log(response);
 
-                console.log(
-                    JSON.stringify(
-                        response,
-                        null,
-                        2
-                    )
-                );
+                document.getElementById("result").innerHTML =
+                    "<b style='color:green'>Project Created Successfully</b>";
 
-                if (
-                    response.data &&
-                    response.data.length
-                ) {
-
-                    console.log(
-                        "Project ID:",
-                        response.data[0].id
-                    );
-
-                    console.log(
-                        "Project Name:",
-                        response.data[0]
-                            .identifier
-                    );
-                }
-
-                document
-                    .getElementById(
-                        "result"
-                    )
-                    .innerHTML =
-                    "Project Created Successfully";
             },
 
-            onFailure: function (
-                error
-            ) {
+            onFailure: function (error) {
 
-                console.log(
-                    "FAILED"
-                );
+                console.log("PROJECT FAILED");
+                console.log(error);
 
-                console.log(
-                    error
-                );
+                document.getElementById("result").innerHTML =
+                    "PROJECT FAILED";
 
-                document
-                    .getElementById(
-                        "result"
-                    )
-                    .innerHTML =
-                    "Project Creation Failed";
             }
         }
     );
