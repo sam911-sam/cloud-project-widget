@@ -1,42 +1,74 @@
 body {
-    font-family: Segoe UI, Arial;
+    font-family: "Segoe UI", Arial, sans-serif;
     background: #f5f6f8;
     padding: 10px;
 }
 
+/* HEADER */
 .header {
-    background: white;
-    padding: 10px;
-    border-left: 4px solid #0076ff;
+    background: #ffffff;
+    padding: 12px 14px;
+    border-left: 4px solid #368ec4;
     font-weight: 600;
-    margin-bottom: 10px;
+    font-size: 14px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    color: #333;
 }
 
+/* TABLE */
 .table {
     width: 100%;
     border-collapse: collapse;
     background: white;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
+/* HEADER ROW */
 .table th {
-    background: #f0f2f5;
+    background: #f4f6f8;
     text-align: left;
-    padding: 10px;
-    font-size: 13px;
+    padding: 12px;
+    font-size: 12px;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #e1e4e8;
 }
 
+/* CELLS */
 .table td {
-    padding: 10px;
+    padding: 12px;
     border-top: 1px solid #eee;
     font-size: 13px;
+    color: #333;
 }
 
+/* ROW HOVER */
+.table tr:hover {
+    background: #f0f7ff;
+}
+
+/* PROJECT LINK */
+.project-link {
+    color: #0076ff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.project-link:hover {
+    text-decoration: underline;
+}
+
+/* STATUS */
 .status-active {
-    color: green;
-    font-weight: bold;
+    color: #2e7d32;
+    font-weight: 600;
 }
 
 .status-inactive {
-    color: red;
-    font-weight: bold;
+    color: #c62828;
+    font-weight: 600;
 }
