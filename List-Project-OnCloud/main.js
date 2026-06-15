@@ -17,7 +17,7 @@ var projectData = [];
             console.log("Project Browser Loaded");
 
             widget.body.innerHTML =
-                '<h3>Projects</h3>' +
+                '<div class="card">' + '<h3>Projects</h3>' + '</div>' +
 
                 '<select id="projectList">' +
                 '<option>Loading...</option>' +
