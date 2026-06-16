@@ -17,9 +17,7 @@
                         '<div id="tableContainer">Loading projects...</div>' +
                     '</div>' +
 
-                    '<div class="right-panel" id="detailPanel">' +
-                        '<div class="empty">Select a project</div>' +
-                    '</div>' +
+                    '<div class="right-panel" id="detailPanel" style="display:none;"></div>' +
 
                 '</div>';
 
@@ -73,11 +71,6 @@ function loadProjects() {
 
 function renderTable(data, spaceUrl) {
 
-    if (!data.length) {
-        document.getElementById("tableContainer").innerHTML = "No projects found";
-        return;
-    }
-
     var html =
         '<table class="table">' +
         '<tr><th>Project</th><th>Status</th></tr>';
@@ -94,9 +87,7 @@ function renderTable(data, spaceUrl) {
                         (p.title || "Unnamed") +
                     '</a>' +
                 '</td>' +
-                '<td class="' + (p.state === "Active" ? "status-active" : "status-inactive") + '">' +
-                    (p.state || "-") +
-                '</td>' +
+                '<td>' + (p.state || "-") + '</td>' +
             '</tr>';
     }
 
@@ -126,7 +117,7 @@ function attachClick(spaceUrl) {
     }
 }
 
-/* ================= DETAILS PANEL (OOTB STYLE) ================= */
+/* ================= DETAILS PANEL ================= */
 
 function openProject(projectId, spaceUrl) {
 
@@ -144,7 +135,10 @@ function openProject(projectId, spaceUrl) {
 
             onComplete: function (res) {
 
-                var p = res.data || {};
+                var data = res.data || {};
+                var p = data.dataelements || data;
+
+                document.getElementById("detailPanel").style.display = "block";
 
                 document.getElementById("detailPanel").innerHTML =
 
@@ -162,6 +156,8 @@ function openProject(projectId, spaceUrl) {
             },
 
             onFailure: function () {
+
+                document.getElementById("detailPanel").style.display = "block";
                 document.getElementById("detailPanel").innerHTML =
                     "<span style='color:red'>Failed to load details</span>";
             }
@@ -172,6 +168,5 @@ function openProject(projectId, spaceUrl) {
 /* ================= CLOSE ================= */
 
 function closePanel() {
-    document.getElementById("detailPanel").innerHTML =
-        '<div class="empty">Select a project</div>';
+    document.getElementById("detailPanel").style.display = "none";
 }
