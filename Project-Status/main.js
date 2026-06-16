@@ -18,7 +18,7 @@
                     '</div>' +
 
                     '<div class="right-panel" id="detailPanel">' +
-                        'Select a project to view details' +
+                        '<div class="empty">Select a project</div>' +
                     '</div>' +
 
                 '</div>';
@@ -69,7 +69,7 @@ function loadProjects() {
     );
 }
 
-/* ================= RENDER TABLE ================= */
+/* ================= TABLE ================= */
 
 function renderTable(data, spaceUrl) {
 
@@ -80,36 +80,23 @@ function renderTable(data, spaceUrl) {
 
     var html =
         '<table class="table">' +
-        '<tr>' +
-            '<th>Project</th>' +
-            '<th>Description</th>' +
-            '<th>Status</th>' +
-        '</tr>';
+        '<tr><th>Project</th><th>Status</th></tr>';
 
     for (var i = 0; i < data.length; i++) {
 
         var p = data[i].dataelements || {};
-
-        var projectId = data[i].physicalid || data[i].id;
-
-        var statusClass =
-            (p.state === "Active") ? "status-active" : "status-inactive";
+        var id = data[i].physicalid || data[i].id;
 
         html +=
             '<tr>' +
-
                 '<td>' +
-                    '<a href="#" class="project-link" data-id="' + projectId + '">' +
+                    '<a href="#" class="project-link" data-id="' + id + '">' +
                         (p.title || "Unnamed") +
                     '</a>' +
                 '</td>' +
-
-                '<td>' + (p.description || "-") + '</td>' +
-
-                '<td class="' + statusClass + '">' +
+                '<td class="' + (p.state === "Active" ? "status-active" : "status-inactive") + '">' +
                     (p.state || "-") +
                 '</td>' +
-
             '</tr>';
     }
 
@@ -120,7 +107,7 @@ function renderTable(data, spaceUrl) {
     attachClick(spaceUrl);
 }
 
-/* ================= CLICK HANDLER ================= */
+/* ================= CLICK ================= */
 
 function attachClick(spaceUrl) {
 
@@ -132,14 +119,14 @@ function attachClick(spaceUrl) {
 
             e.preventDefault();
 
-            var projectId = this.getAttribute("data-id");
+            var id = this.getAttribute("data-id");
 
-            openProject(projectId, spaceUrl);
+            openProject(id, spaceUrl);
         };
     }
 }
 
-/* ================= DETAILS PANEL ================= */
+/* ================= DETAILS PANEL (OOTB STYLE) ================= */
 
 function openProject(projectId, spaceUrl) {
 
@@ -157,15 +144,21 @@ function openProject(projectId, spaceUrl) {
 
             onComplete: function (res) {
 
-                var p = res.data || res;
+                var p = res.data || {};
 
                 document.getElementById("detailPanel").innerHTML =
-                    '<div class="detail-title">' + (p.title || "-") + '</div>' +
 
-                    '<div class="detail-row"><b>Description:</b> ' + (p.description || "-") + '</div>' +
-                    '<div class="detail-row"><b>Status:</b> ' + (p.state || "-") + '</div>' +
-                    '<div class="detail-row"><b>Owner:</b> ' + (p.owner || "-") + '</div>' +
-                    '<div class="detail-row"><b>Created:</b> ' + (p.created || "-") + '</div>';
+                    '<div class="ootb-title">Details</div>' +
+
+                    '<div class="row"><div class="label">Type</div><div class="value">Project</div></div>' +
+                    '<div class="row"><div class="label">Title</div><div class="value">' + (p.title || "-") + '</div></div>' +
+                    '<div class="row"><div class="label">Description</div><div class="value">' + (p.description || "-") + '</div></div>' +
+                    '<div class="row"><div class="label">Maturity State</div><div class="value">' + (p.state || "-") + '</div></div>' +
+                    '<div class="row"><div class="label">Owner</div><div class="value">' + (p.owner || "-") + '</div></div>' +
+
+                    '<div class="footer">' +
+                        '<button onclick="closePanel()">Close</button>' +
+                    '</div>';
             },
 
             onFailure: function () {
@@ -174,4 +167,11 @@ function openProject(projectId, spaceUrl) {
             }
         });
     });
+}
+
+/* ================= CLOSE ================= */
+
+function closePanel() {
+    document.getElementById("detailPanel").innerHTML =
+        '<div class="empty">Select a project</div>';
 }
