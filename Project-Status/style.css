@@ -4,7 +4,6 @@ body {
     margin: 0;
 }
 
-/* HEADER */
 .header {
     background: #fff;
     padding: 12px;
@@ -13,19 +12,16 @@ body {
     box-shadow: 0 1px 3px rgba(0,0,0,0.08);
 }
 
-/* LAYOUT */
 .container {
     display: flex;
     gap: 10px;
     padding: 10px;
 }
 
-/* LEFT */
 .left-panel {
     width: 55%;
 }
 
-/* RIGHT PANEL */
 .right-panel {
     width: 45%;
     background: white;
@@ -63,27 +59,15 @@ body {
 .project-link {
     color: #333;
     text-decoration: none;
-    font-weight: 500;
 }
 
 .project-link:hover {
     color: #0076ff;
 }
 
-/* STATUS */
-.status-active {
-    color: green;
-    font-weight: bold;
-}
-
-.status-inactive {
-    color: red;
-    font-weight: bold;
-}
-
 /* OOTB PANEL */
 .ootb-title {
-    font-weight: bold;
+    font-weight: 700;
     font-size: 14px;
     margin-bottom: 10px;
     border-bottom: 1px solid #ddd;
@@ -104,7 +88,6 @@ body {
 
 .value {
     width: 60%;
-    color: #222;
 }
 
 .footer {
@@ -123,8 +106,4 @@ body {
 
 .footer button:hover {
     background: #2f76a3;
-}
-
-.empty {
-    color: #888;
 }
