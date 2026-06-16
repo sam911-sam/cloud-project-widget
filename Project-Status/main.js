@@ -11,7 +11,17 @@
 
             widget.body.innerHTML =
                 '<div class="header">Project Status</div>' +
-                '<div id="tableContainer">Loading projects...</div>';
+                '<div class="container">' +
+
+                    '<div class="left-panel">' +
+                        '<div id="tableContainer">Loading projects...</div>' +
+                    '</div>' +
+
+                    '<div class="right-panel" id="detailPanel">' +
+                        'Select a project to view details' +
+                    '</div>' +
+
+                '</div>';
 
             loadProjects();
         });
@@ -21,7 +31,7 @@
 
 })();
 
-/* ---------------- LOAD PROJECTS ---------------- */
+/* ================= LOAD PROJECTS ================= */
 
 function loadProjects() {
 
@@ -37,9 +47,7 @@ function loadProjects() {
 
                     var spaceUrl = services["3DSpace"];
 
-                    var url =
-                        spaceUrl +
-                        "/resources/v1/modeler/projects";
+                    var url = spaceUrl + "/resources/v1/modeler/projects";
 
                     WAFData.authenticatedRequest(url, {
 
@@ -47,15 +55,12 @@ function loadProjects() {
                         type: "json",
 
                         onComplete: function (res) {
-
                             renderTable(res.data || [], spaceUrl);
                         },
 
                         onFailure: function () {
-
-                            document.getElementById("tableContainer")
-                                .innerHTML =
-                                "<div style='color:red'>Failed to load projects</div>";
+                            document.getElementById("tableContainer").innerHTML =
+                                "<span style='color:red'>Failed to load projects</span>";
                         }
                     });
                 }
@@ -64,52 +69,45 @@ function loadProjects() {
     );
 }
 
-/* ---------------- RENDER TABLE ---------------- */
+/* ================= RENDER TABLE ================= */
 
 function renderTable(data, spaceUrl) {
 
     if (!data.length) {
-        document.getElementById("tableContainer").innerHTML =
-            "No projects found";
+        document.getElementById("tableContainer").innerHTML = "No projects found";
         return;
     }
 
     var html =
         '<table class="table">' +
         '<tr>' +
-            '<th>Title</th>' +
+            '<th>Project</th>' +
             '<th>Description</th>' +
             '<th>Status</th>' +
         '</tr>';
 
     for (var i = 0; i < data.length; i++) {
 
-        var p = data[i].dataelements;
+        var p = data[i].dataelements || {};
 
-        /* IMPORTANT: use physicalid/id */
-        var projectId =
-            data[i].physicalid ||
-            data[i].id;
+        var projectId = data[i].physicalid || data[i].id;
 
         var statusClass =
-            (p.state === "Active")
-                ? "status-active"
-                : "status-inactive";
+            (p.state === "Active") ? "status-active" : "status-inactive";
 
         html +=
             '<tr>' +
 
-                /* CLICKABLE PROJECT NAME */
                 '<td>' +
                     '<a href="#" class="project-link" data-id="' + projectId + '">' +
-                        (p.title || "Unnamed Project") +
+                        (p.title || "Unnamed") +
                     '</a>' +
                 '</td>' +
 
                 '<td>' + (p.description || "-") + '</td>' +
 
                 '<td class="' + statusClass + '">' +
-                    (p.state || "Unknown") +
+                    (p.state || "-") +
                 '</td>' +
 
             '</tr>';
@@ -122,7 +120,7 @@ function renderTable(data, spaceUrl) {
     attachClick(spaceUrl);
 }
 
-/* ---------------- CLICK HANDLER ---------------- */
+/* ================= CLICK HANDLER ================= */
 
 function attachClick(spaceUrl) {
 
@@ -134,24 +132,46 @@ function attachClick(spaceUrl) {
 
             e.preventDefault();
 
-            var projectId =
-                this.getAttribute("data-id");
+            var projectId = this.getAttribute("data-id");
 
             openProject(projectId, spaceUrl);
         };
     }
 }
 
-/* ---------------- OPEN PROJECT ---------------- */
+/* ================= DETAILS PANEL ================= */
 
 function openProject(projectId, spaceUrl) {
 
-    /* CORRECT ENOVIA URL (based on your system) */
     var url =
         spaceUrl +
-        "/enovia/common/emxNavigator.jsp" +
-        "?appName=ENOBUPS_AP" +
-        "&objectId=" + projectId;
+        "/resources/v1/modeler/projects/" +
+        projectId;
 
-    window.open(url, "_blank");
+    require(["DS/WAFData/WAFData"], function (WAFData) {
+
+        WAFData.authenticatedRequest(url, {
+
+            method: "GET",
+            type: "json",
+
+            onComplete: function (res) {
+
+                var p = res.data || res;
+
+                document.getElementById("detailPanel").innerHTML =
+                    '<div class="detail-title">' + (p.title || "-") + '</div>' +
+
+                    '<div class="detail-row"><b>Description:</b> ' + (p.description || "-") + '</div>' +
+                    '<div class="detail-row"><b>Status:</b> ' + (p.state || "-") + '</div>' +
+                    '<div class="detail-row"><b>Owner:</b> ' + (p.owner || "-") + '</div>' +
+                    '<div class="detail-row"><b>Created:</b> ' + (p.created || "-") + '</div>';
+            },
+
+            onFailure: function () {
+                document.getElementById("detailPanel").innerHTML =
+                    "<span style='color:red'>Failed to load details</span>";
+            }
+        });
+    });
 }
