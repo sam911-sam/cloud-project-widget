@@ -1,109 +1,59 @@
-body {
-    font-family: "Segoe UI", Arial;
-    background: #f5f6f8;
-    margin: 0;
+.container-full{
+    width:100%;
 }
 
-.header {
-    background: #fff;
-    padding: 12px;
-    border-left: 5px solid #368ec4;
-    font-weight: 700;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+.left-panel-full{
+    width:100%;
 }
 
-.container {
-    display: flex;
-    gap: 10px;
-    padding: 10px;
+.container-split{
+    display:flex;
+    gap:10px;
 }
 
-.left-panel {
-    width: 55%;
+.container-split .left-panel{
+    width:50%;
 }
 
-.right-panel {
-    width: 45%;
-    background: white;
-    border-radius: 6px;
-    padding: 12px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+.container-split .right-panel{
+    width:50%;
 }
 
-/* TABLE */
-.table {
-    width: 100%;
-    border-collapse: collapse;
-    background: white;
+.right-panel{
+    background:white;
+    padding:12px;
+    border-radius:6px;
+    box-shadow:0 1px 4px rgba(0,0,0,0.1);
 }
 
-.table th {
-    background: #f3f5f7;
-    padding: 10px;
-    font-size: 12px;
-    text-align: left;
-    color: #666;
+.row{
+    display:flex;
+    padding:8px 0;
+    border-bottom:1px solid #eee;
 }
 
-.table td {
-    padding: 10px;
-    font-size: 13px;
-    border-top: 1px solid #eee;
+.label{
+    width:40%;
+    font-weight:600;
+    color:#666;
 }
 
-.table tr:hover {
-    background: #eef6ff;
+.value{
+    width:60%;
 }
 
-/* LINK */
-.project-link {
-    color: #333;
-    text-decoration: none;
+.footer{
+    margin-top:15px;
+    text-align:right;
 }
 
-.project-link:hover {
-    color: #0076ff;
+.footer button{
+    padding:6px 12px;
+    cursor:pointer;
 }
 
-/* OOTB PANEL */
-.ootb-title {
-    font-weight: 700;
-    font-size: 14px;
-    margin-bottom: 10px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 5px;
-}
-
-.row {
-    display: flex;
-    padding: 6px 0;
-    border-bottom: 1px solid #f2f2f2;
-}
-
-.label {
-    width: 40%;
-    color: #666;
-    font-weight: 600;
-}
-
-.value {
-    width: 60%;
-}
-
-.footer {
-    margin-top: 15px;
-    text-align: right;
-}
-
-.footer button {
-    background: #368ec4;
-    color: white;
-    border: none;
-    padding: 6px 14px;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-.footer button:hover {
-    background: #2f76a3;
+.ootb-title{
+    font-size:14px;
+    font-weight:700;
+    margin-bottom:10px;
 }
