@@ -12,14 +12,16 @@ var projectData = [];
         widget.addEvent("onLoad", function () {
 
             widget.body.innerHTML =
-                '<div class="header">Project Status</div>' +
-                '<div class="container">' +
 
-                    '<div class="left-panel">' +
+                '<div class="header">Project Status</div>' +
+
+                '<div id="container" class="container-full">' +
+
+                    '<div id="leftPanel" class="left-panel-full">' +
                         '<div id="tableContainer">Loading projects...</div>' +
                     '</div>' +
 
-                    '<div class="right-panel" id="detailPanel" style="display:none;"></div>' +
+                    '<div id="detailPanel" class="right-panel" style="display:none;"></div>' +
 
                 '</div>';
 
@@ -65,8 +67,6 @@ function loadProjects() {
                             projectData =
                                 response.data || [];
 
-                            console.log("Projects:", projectData);
-
                             renderTable(projectData);
                         },
 
@@ -90,7 +90,7 @@ function loadProjects() {
 
 function renderTable(data) {
 
-    if (!data.length) {
+    if (!data || !data.length) {
 
         document.getElementById(
             "tableContainer"
@@ -132,8 +132,7 @@ function renderTable(data) {
 
     document.getElementById(
         "tableContainer"
-    ).innerHTML =
-        html;
+    ).innerHTML = html;
 
     attachClick();
 }
@@ -177,10 +176,12 @@ function showProjectDetails(index) {
     var p =
         project.dataelements || {};
 
-    var owner =
-        p.owner ||
-        p.ownerName ||
-        "-";
+    /* Switch to split view */
+    document.getElementById("container").className =
+        "container-split";
+
+    document.getElementById("leftPanel").className =
+        "left-panel";
 
     document.getElementById(
         "detailPanel"
@@ -229,7 +230,7 @@ function showProjectDetails(index) {
         '<div class="row">' +
             '<div class="label">Owner</div>' +
             '<div class="value">' +
-                owner +
+                (p.owner || "-") +
             '</div>' +
         '</div>' +
 
@@ -246,4 +247,14 @@ function closePanel() {
         "detailPanel"
     ).style.display =
         "none";
-}
+
+    document.getElementById(
+        "container"
+    ).className =
+        "container-full";
+
+    document.getElementById(
+        "leftPanel"
+    ).className =
+        "left-panel-full";
+}8
