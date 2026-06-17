@@ -1,36 +1,68 @@
-body{
-    margin:0;
-    padding:10px;
-    font-family:"Segoe UI",Arial,sans-serif;
-    background:#f5f6f8;
-}
-
-/* Header */
-
+/* ================= HEADER ================= */
 .header{
-    background:#ffffff;
-    padding:12px 15px;
-    font-size:16px;
+    font-size:18px;
     font-weight:600;
-    border-bottom:1px solid #d6d6d6;
+    padding:10px;
+    border-bottom:1px solid #ddd;
     margin-bottom:10px;
+    background:#fff;
 }
 
-/* Full width mode */
-
-.container-full{
+/* ================= TABLE FULL WIDTH ================= */
+.table{
     width:100%;
+    border-collapse:collapse;
+    background:#fff;
+    table-layout:fixed;
+    border:1px solid #dcdcdc;
 }
 
-.left-panel-full{
-    width:100%;
+/* HEADER */
+.table th{
+    text-align:left;
+    padding:12px;
+    background:#f3f5f7;
+    border-bottom:1px solid #dcdcdc;
+    font-size:13px;
+    font-weight:600;
 }
 
-/* Split mode */
+/* ROWS */
+.table td{
+    padding:12px;
+    border-bottom:1px solid #e6e6e6;
+    font-size:13px;
+    vertical-align:middle;
+}
 
+/* HOVER EFFECT */
+.table tr:hover{
+    background:#eef6ff;
+}
+
+/* ================= PROJECT NAME (BIGGER + BOLD) ================= */
+.project-link{
+    font-size:15px;
+    font-weight:700;
+    color:#1f1f1f;
+    text-decoration:none;
+}
+
+.project-link:hover{
+    color:#0076ff;
+    text-decoration:underline;
+}
+
+/* ================= STATUS GREEN ================= */
+.status-green{
+    color:#1e7d32;
+    font-weight:700;
+    font-size:14px;
+}
+
+/* ================= SPLIT VIEW ================= */
 .container-split{
     display:flex;
-    width:100%;
     gap:10px;
 }
 
@@ -40,88 +72,12 @@ body{
 
 .right-panel{
     width:50%;
-    background:#ffffff;
-    border:1px solid #dcdcdc;
-    border-radius:4px;
-    padding:15px;
-    box-sizing:border-box;
+    background:#fff;
+    border:1px solid #ddd;
+    padding:12px;
 }
 
-/* Table */
-
-.table{
+/* FULL WIDTH MODE */
+.container-full .left-panel-full{
     width:100%;
-    border-collapse:collapse;
-    background:#ffffff;
-}
-
-.table th{
-    text-align:left;
-    background:#f3f5f7;
-    padding:10px;
-    border-bottom:1px solid #dcdcdc;
-}
-
-.table td{
-    padding:10px;
-    border-bottom:1px solid #eeeeee;
-}
-
-.table tr:hover{
-    background:#eef6ff;
-}
-
-/* Links */
-
-.project-link{
-    color:#005686;
-    text-decoration:none;
-    cursor:pointer;
-}
-
-.project-link:hover{
-    text-decoration:underline;
-}
-
-/* Details */
-
-.ootb-title{
-    font-size:16px;
-    font-weight:600;
-    margin-bottom:15px;
-}
-
-.row{
-    display:flex;
-    padding:10px 0;
-    border-bottom:1px solid #eeeeee;
-}
-
-.label{
-    width:35%;
-    font-weight:600;
-    color:#666666;
-}
-
-.value{
-    width:65%;
-    color:#222222;
-}
-
-.footer{
-    margin-top:20px;
-    text-align:right;
-}
-
-.footer button{
-    padding:8px 15px;
-    background:#368ec4;
-    border:none;
-    color:white;
-    border-radius:3px;
-    cursor:pointer;
-}
-
-.footer button:hover{
-    background:#2f7bac;
 }
