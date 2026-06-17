@@ -173,6 +173,11 @@ function showProjectDetails(index) {
         return;
     }
 
+console.log("Selected Project:");
+console.log(project);
+
+alert(JSON.stringify(project, null, 2));
+    
     var p =
         project.dataelements || {};
 
