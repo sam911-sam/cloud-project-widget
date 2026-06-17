@@ -134,7 +134,7 @@ function renderTable(data) {
                 '</td>' +
 
                 '<td>' +
-                    (p.state || "-") +
+                   '<span class="status-green">' + (p.state || "-") + '</span>' +
                 '</td>' +
 
             '</tr>';
