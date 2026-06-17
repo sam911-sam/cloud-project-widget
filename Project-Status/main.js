@@ -38,33 +38,22 @@ var projectData = [];
 function loadProjects() {
 
     require(
-        [
-            "DS/WAFData/WAFData",
-            "DS/i3DXCompassServices/i3DXCompassServices"
-        ],
-        function (
-            WAFData,
-            CompassServices
-        ) {
+        ["DS/WAFData/WAFData", "DS/i3DXCompassServices/i3DXCompassServices"],
+        function (WAFData, CompassServices) {
 
             CompassServices.getPlatformServices({
 
-                platformId:
-                    widget.getValue("x3dPlatformId"),
+                platformId: widget.getValue("x3dPlatformId"),
 
                 onComplete: function (services) {
 
-                    var spaceUrl =
-                        services["3DSpace"];
+                    var spaceUrl = services["3DSpace"];
 
-                    var url =
-                        spaceUrl +
-                        "/resources/v1/modeler/projects";
+                    var url = spaceUrl + "/resources/v1/modeler/projects";
 
                     WAFData.authenticatedRequest(url, {
 
                         method: "GET",
-
                         type: "json",
 
                         headers: {
@@ -73,11 +62,7 @@ function loadProjects() {
 
                         onComplete: function (response) {
 
-                            projectData =
-                                response.data || [];
-
-                            console.log("Projects:", projectData);
-
+                            projectData = response.data || [];
                             renderTable(projectData);
                         },
 
@@ -85,9 +70,7 @@ function loadProjects() {
 
                             console.log(error);
 
-                            document.getElementById(
-                                "tableContainer"
-                            ).innerHTML =
+                            document.getElementById("tableContainer").innerHTML =
                                 "<span style='color:red'>Failed to load projects</span>";
                         }
                     });
@@ -102,26 +85,21 @@ function loadProjects() {
 function renderTable(data) {
 
     if (!data.length) {
-
-        document.getElementById(
-            "tableContainer"
-        ).innerHTML =
+        document.getElementById("tableContainer").innerHTML =
             "No Projects Found";
-
         return;
     }
 
     var html =
         '<table class="table">' +
-            '<tr>' +
-                '<th>Project</th>' +
-                '<th>Status</th>' +
-            '</tr>';
+        '<tr>' +
+            '<th>Project</th>' +
+            '<th>Status</th>' +
+        '</tr>';
 
     for (var i = 0; i < data.length; i++) {
 
-        var p =
-            data[i].dataelements || {};
+        var p = data[i].dataelements || {};
 
         html +=
 
@@ -134,7 +112,7 @@ function renderTable(data) {
                 '</td>' +
 
                 '<td>' +
-                   '<span class="status-green">' + (p.state || "-") + '</span>' +
+                    '<span class="status-pill">' + (p.state || "-") + '</span>' +
                 '</td>' +
 
             '</tr>';
@@ -142,10 +120,7 @@ function renderTable(data) {
 
     html += '</table>';
 
-    document.getElementById(
-        "tableContainer"
-    ).innerHTML =
-        html;
+    document.getElementById("tableContainer").innerHTML = html;
 
     attachClick();
 }
@@ -154,10 +129,7 @@ function renderTable(data) {
 
 function attachClick() {
 
-    var links =
-        document.getElementsByClassName(
-            "project-link"
-        );
+    var links = document.getElementsByClassName("project-link");
 
     for (var i = 0; i < links.length; i++) {
 
@@ -165,10 +137,7 @@ function attachClick() {
 
             e.preventDefault();
 
-            var index =
-                this.getAttribute(
-                    "data-index"
-                );
+            var index = this.getAttribute("data-index");
 
             showProjectDetails(index);
         };
@@ -179,71 +148,40 @@ function attachClick() {
 
 function showProjectDetails(index) {
 
-    var project =
-        projectData[index];
+    var project = projectData[index];
 
-    if (!project) {
-        return;
-    }
+    if (!project) return;
 
-    var p =
-        project.dataelements || {};
+    var p = project.dataelements || {};
 
-    document.getElementById(
-        "container"
-    ).className =
-        "container-split";
+    document.getElementById("container").className = "container-split";
+    document.getElementById("leftPanel").className = "left-panel";
 
-    document.getElementById(
-        "leftPanel"
-    ).className =
-        "left-panel";
+    document.getElementById("detailPanel").style.display = "block";
 
-    document.getElementById(
-        "detailPanel"
-    ).style.display =
-        "block";
-
-    document.getElementById(
-        "detailPanel"
-    ).innerHTML =
+    document.getElementById("detailPanel").innerHTML =
 
         '<div class="ootb-title">Details</div>' +
 
-        '<div class="row">' +
-            '<div class="label">Type</div>' +
-            '<div class="value">' +
-                (p.objType || project.type || "-") +
-            '</div>' +
-        '</div>' +
+        '<div class="row"><div class="label">Type</div><div class="value">' +
+            (p.objType || project.type || "-") +
+        '</div></div>' +
 
-        '<div class="row">' +
-            '<div class="label">Title</div>' +
-            '<div class="value">' +
-                (p.title || "-") +
-            '</div>' +
-        '</div>' +
+        '<div class="row"><div class="label">Title</div><div class="value">' +
+            (p.title || "-") +
+        '</div></div>' +
 
-        '<div class="row">' +
-            '<div class="label">Name</div>' +
-            '<div class="value">' +
-                (p.name || "-") +
-            '</div>' +
-        '</div>' +
+        '<div class="row"><div class="label">Name</div><div class="value">' +
+            (p.name || "-") +
+        '</div></div>' +
 
-        '<div class="row">' +
-            '<div class="label">Description</div>' +
-            '<div class="value">' +
-                (p.description || "-") +
-            '</div>' +
-        '</div>' +
+        '<div class="row"><div class="label">Description</div><div class="value">' +
+            (p.description || "-") +
+        '</div></div>' +
 
-        '<div class="row">' +
-            '<div class="label">Maturity State</div>' +
-            '<div class="value">' +
-                (p.state || "-") +
-            '</div>' +
-        '</div>' +
+        '<div class="row"><div class="label">Maturity State</div><div class="value">' +
+            (p.state || "-") +
+        '</div></div>' +
 
         '<div class="footer">' +
             '<button onclick="closePanel()">Close</button>' +
@@ -254,18 +192,8 @@ function showProjectDetails(index) {
 
 function closePanel() {
 
-    document.getElementById(
-        "detailPanel"
-    ).style.display =
-        "none";
+    document.getElementById("detailPanel").style.display = "none";
 
-    document.getElementById(
-        "container"
-    ).className =
-        "container-full";
-
-    document.getElementById(
-        "leftPanel"
-    ).className =
-        "left-panel-full";
+    document.getElementById("container").className = "container-full";
+    document.getElementById("leftPanel").className = "left-panel-full";
 }
