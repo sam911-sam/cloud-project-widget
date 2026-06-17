@@ -1,3 +1,5 @@
+var projectData = [];
+
 (function () {
 
     function init() {
@@ -45,19 +47,36 @@ function loadProjects() {
 
                     var spaceUrl = services["3DSpace"];
 
-                    var url = spaceUrl + "/resources/v1/modeler/projects";
+                    var url =
+                        spaceUrl +
+                        "/resources/v1/modeler/projects";
 
                     WAFData.authenticatedRequest(url, {
 
                         method: "GET",
                         type: "json",
 
-                        onComplete: function (res) {
-                            renderTable(res.data || [], spaceUrl);
+                        headers: {
+                            "Accept": "application/json"
                         },
 
-                        onFailure: function () {
-                            document.getElementById("tableContainer").innerHTML =
+                        onComplete: function (response) {
+
+                            projectData =
+                                response.data || [];
+
+                            console.log("Projects:", projectData);
+
+                            renderTable(projectData);
+                        },
+
+                        onFailure: function (error) {
+
+                            console.log(error);
+
+                            document.getElementById(
+                                "tableContainer"
+                            ).innerHTML =
                                 "<span style='color:red'>Failed to load projects</span>";
                         }
                     });
@@ -69,40 +88,64 @@ function loadProjects() {
 
 /* ================= TABLE ================= */
 
-function renderTable(data, spaceUrl) {
+function renderTable(data) {
+
+    if (!data.length) {
+
+        document.getElementById(
+            "tableContainer"
+        ).innerHTML =
+            "No projects found";
+
+        return;
+    }
 
     var html =
         '<table class="table">' +
-        '<tr><th>Project</th><th>Status</th></tr>';
+        '<tr>' +
+            '<th>Project</th>' +
+            '<th>Status</th>' +
+        '</tr>';
 
     for (var i = 0; i < data.length; i++) {
 
-        var p = data[i].dataelements || {};
-        var id = data[i].physicalid || data[i].id;
+        var p =
+            data[i].dataelements || {};
 
         html +=
             '<tr>' +
+
                 '<td>' +
-                    '<a href="#" class="project-link" data-id="' + id + '">' +
-                        (p.title || "Unnamed") +
+                    '<a href="#" class="project-link" data-index="' + i + '">' +
+                        (p.title || p.name || "Unnamed") +
                     '</a>' +
                 '</td>' +
-                '<td>' + (p.state || "-") + '</td>' +
+
+                '<td>' +
+                    (p.state || "-") +
+                '</td>' +
+
             '</tr>';
     }
 
     html += '</table>';
 
-    document.getElementById("tableContainer").innerHTML = html;
+    document.getElementById(
+        "tableContainer"
+    ).innerHTML =
+        html;
 
-    attachClick(spaceUrl);
+    attachClick();
 }
 
 /* ================= CLICK ================= */
 
-function attachClick(spaceUrl) {
+function attachClick() {
 
-    var links = document.getElementsByClassName("project-link");
+    var links =
+        document.getElementsByClassName(
+            "project-link"
+        );
 
     for (var i = 0; i < links.length; i++) {
 
@@ -110,63 +153,97 @@ function attachClick(spaceUrl) {
 
             e.preventDefault();
 
-            var id = this.getAttribute("data-id");
+            var index =
+                this.getAttribute(
+                    "data-index"
+                );
 
-            openProject(id, spaceUrl);
+            showProjectDetails(index);
         };
     }
 }
 
-/* ================= DETAILS PANEL ================= */
+/* ================= DETAILS ================= */
 
-function openProject(projectId, spaceUrl) {
+function showProjectDetails(index) {
 
-    var url =
-        spaceUrl +
-        "/resources/v1/modeler/projects/" +
-        projectId;
+    var project =
+        projectData[index];
 
-    require(["DS/WAFData/WAFData"], function (WAFData) {
+    if (!project) {
+        return;
+    }
 
-        WAFData.authenticatedRequest(url, {
+    var p =
+        project.dataelements || {};
 
-            method: "GET",
-            type: "json",
+    var owner =
+        p.owner ||
+        p.ownerName ||
+        "-";
 
-            onComplete: function (res) {
+    document.getElementById(
+        "detailPanel"
+    ).style.display =
+        "block";
 
-                var data = res.data || {};
-                var p = data.dataelements || data;
+    document.getElementById(
+        "detailPanel"
+    ).innerHTML =
 
-                document.getElementById("detailPanel").style.display = "block";
+        '<div class="ootb-title">Details</div>' +
 
-                document.getElementById("detailPanel").innerHTML =
+        '<div class="row">' +
+            '<div class="label">Type</div>' +
+            '<div class="value">Project</div>' +
+        '</div>' +
 
-                    '<div class="ootb-title">Details</div>' +
+        '<div class="row">' +
+            '<div class="label">Title</div>' +
+            '<div class="value">' +
+                (p.title || "-") +
+            '</div>' +
+        '</div>' +
 
-                    '<div class="row"><div class="label">Type</div><div class="value">Project</div></div>' +
-                    '<div class="row"><div class="label">Title</div><div class="value">' + (p.title || "-") + '</div></div>' +
-                    '<div class="row"><div class="label">Description</div><div class="value">' + (p.description || "-") + '</div></div>' +
-                    '<div class="row"><div class="label">Maturity State</div><div class="value">' + (p.state || "-") + '</div></div>' +
-                    '<div class="row"><div class="label">Owner</div><div class="value">' + (p.owner || "-") + '</div></div>' +
+        '<div class="row">' +
+            '<div class="label">Name</div>' +
+            '<div class="value">' +
+                (p.name || "-") +
+            '</div>' +
+        '</div>' +
 
-                    '<div class="footer">' +
-                        '<button onclick="closePanel()">Close</button>' +
-                    '</div>';
-            },
+        '<div class="row">' +
+            '<div class="label">Description</div>' +
+            '<div class="value">' +
+                (p.description || "-") +
+            '</div>' +
+        '</div>' +
 
-            onFailure: function () {
+        '<div class="row">' +
+            '<div class="label">State</div>' +
+            '<div class="value">' +
+                (p.state || "-") +
+            '</div>' +
+        '</div>' +
 
-                document.getElementById("detailPanel").style.display = "block";
-                document.getElementById("detailPanel").innerHTML =
-                    "<span style='color:red'>Failed to load details</span>";
-            }
-        });
-    });
+        '<div class="row">' +
+            '<div class="label">Owner</div>' +
+            '<div class="value">' +
+                owner +
+            '</div>' +
+        '</div>' +
+
+        '<div class="footer">' +
+            '<button onclick="closePanel()">Close</button>' +
+        '</div>';
 }
 
 /* ================= CLOSE ================= */
 
 function closePanel() {
-    document.getElementById("detailPanel").style.display = "none";
+
+    document.getElementById(
+        "detailPanel"
+    ).style.display =
+        "none";
 }
