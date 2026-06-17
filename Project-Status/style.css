@@ -1,14 +1,20 @@
-/* ================= HEADER ================= */
+body{
+    margin:0;
+    padding:10px;
+    font-family:Arial, sans-serif;
+    background:#f5f6f8;
+}
+
+/* HEADER */
 .header{
     font-size:18px;
     font-weight:600;
     padding:10px;
-    border-bottom:1px solid #ddd;
-    margin-bottom:10px;
     background:#fff;
+    border-bottom:1px solid #ddd;
 }
 
-/* ================= TABLE FULL WIDTH ================= */
+/* TABLE */
 .table{
     width:100%;
     border-collapse:collapse;
@@ -17,30 +23,21 @@
     border:1px solid #dcdcdc;
 }
 
-/* HEADER */
 .table th{
     text-align:left;
     padding:12px;
-    background:#f3f5f7;
-    border-bottom:1px solid #dcdcdc;
+    background:#2f80ed;   /* OOTB BLUE */
+    color:white;
     font-size:13px;
     font-weight:600;
 }
 
-/* ROWS */
 .table td{
     padding:12px;
-    border-bottom:1px solid #e6e6e6;
-    font-size:13px;
-    vertical-align:middle;
+    border-bottom:1px solid #eee;
 }
 
-/* HOVER EFFECT */
-.table tr:hover{
-    background:#eef6ff;
-}
-
-/* ================= PROJECT NAME (BIGGER + BOLD) ================= */
+/* PROJECT NAME */
 .project-link{
     font-size:15px;
     font-weight:700;
@@ -49,18 +46,22 @@
 }
 
 .project-link:hover{
-    color:#0076ff;
+    color:#2f80ed;
     text-decoration:underline;
 }
 
-/* ================= STATUS GREEN ================= */
-.status-green{
-    color:#1e7d32;
-    font-weight:700;
-    font-size:14px;
+/* STATUS BLUE PILL */
+.status-pill{
+    background:#2f80ed;
+    color:#fff;
+    padding:4px 10px;
+    border-radius:12px;
+    font-size:12px;
+    font-weight:600;
+    display:inline-block;
 }
 
-/* ================= SPLIT VIEW ================= */
+/* SPLIT VIEW */
 .container-split{
     display:flex;
     gap:10px;
@@ -74,10 +75,57 @@
     width:50%;
     background:#fff;
     border:1px solid #ddd;
-    padding:12px;
+    padding:15px;
+    box-sizing:border-box;
 }
 
-/* FULL WIDTH MODE */
+/* FULL WIDTH */
 .container-full .left-panel-full{
     width:100%;
+}
+
+/* DETAILS */
+.ootb-title{
+    font-size:16px;
+    font-weight:600;
+    margin-bottom:10px;
+    border-bottom:1px solid #eee;
+    padding-bottom:8px;
+}
+
+.row{
+    display:flex;
+    padding:8px 0;
+    border-bottom:1px solid #f0f0f0;
+}
+
+.label{
+    width:40%;
+    font-weight:600;
+    color:#666;
+}
+
+.value{
+    width:60%;
+    color:#222;
+    word-break:break-word;
+}
+
+/* CLOSE BUTTON */
+.footer{
+    margin-top:15px;
+    text-align:right;
+}
+
+.footer button{
+    background:#2f80ed;
+    color:#fff;
+    border:none;
+    padding:6px 14px;
+    border-radius:3px;
+    cursor:pointer;
+}
+
+.footer button:hover{
+    background:#1f6fe0;
 }
