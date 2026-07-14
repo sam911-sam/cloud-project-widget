@@ -49,7 +49,7 @@ function loadProjects() {
 
                     var spaceUrl = services["3DSpace"];
 
-                    var url = spaceUrl + "/resources/v1/modeler/projects";
+                    var url = spaceUrl + "/resources/v1/modeler/projects?$include=ownerInfo";
 
                     WAFData.authenticatedRequest(url, {
 
@@ -61,6 +61,9 @@ function loadProjects() {
                         },
 
                         onComplete: function (response) {
+
+                            console.log("Full Response:");
+                            console.log(JSON.stringify(response, null, 2));
 
                             projectData = response.data || [];
                             renderTable(projectData);
