@@ -154,6 +154,19 @@ function showProjectDetails(index) {
 
     var p = project.dataelements || {};
 
+     var owner = "-";
+    if (project.relateddata &&
+        project.relateddata.ownerInfo &&
+        project.relateddata.ownerInfo.length > 0) {
+
+        var o = project.relateddata.ownerInfo[0].dataelements || {};
+        owner = ((o.firstname || "") + " " + (o.lastname || "")).trim();
+
+        if (!owner) {
+            owner = o.name || "-";
+        }
+    }
+
     document.getElementById("container").className = "container-split";
     document.getElementById("leftPanel").className = "left-panel";
 
@@ -181,6 +194,10 @@ function showProjectDetails(index) {
 
         '<div class="row"><div class="label">Maturity State</div><div class="value">' +
             (p.state || "-") +
+        '</div></div>' +
+
+         '<div class="row"><div class="label">Owner</div><div class="value">' +
+            owner +
         '</div></div>' +
 
         '<div class="footer">' +
