@@ -1,15 +1,12 @@
-
 var projectData = [];
 var selectedProjectId = null;
 var selectedProjectCestamp = null;
 var spaceUrl = null;
 var csrfToken = null;
 
-
 widget.addEvent("onLoad", function () {
 
-    widget.body.innerHTML =
-        "<h3>Loading Projects...</h3>";
+    widget.body.innerHTML = "<h3>Loading Projects...</h3>";
 
     require([
         "DS/WAFData/WAFData",
@@ -19,39 +16,28 @@ widget.addEvent("onLoad", function () {
         window.WAFData = WAFData;
 
         CompassServices.getPlatformServices({
-
-            platformId:
-                widget.getValue("x3dPlatformId"),
+            platformId: widget.getValue("x3dPlatformId"),
 
             onComplete: function (services) {
 
                 console.log("Services:", services);
 
-                spaceUrl =
-                    services["3DSpace"];
+                spaceUrl = services["3DSpace"];
 
-                console.log(
-                    "3DSpace URL:",
-                    spaceUrl
-                );
+                console.log("3DSpace URL:", spaceUrl);
 
                 getCSRF();
             },
 
             onFailure: function (err) {
-
                 console.log(err);
-
-                alert(
-                    "Failed to get platform services"
-                );
+                alert("Failed to get platform services");
             }
         });
 
     });
 
 });
-
 
 /* ===========================
    CSRF
@@ -63,23 +49,21 @@ function getCSRF() {
         spaceUrl +
         "/resources/v1/application/CSRF";
 
+    console.log("CSRF URL:", csrfUrl);
 
     WAFData.authenticatedRequest(
         csrfUrl,
         {
-
             method: "GET",
             type: "json",
 
             onComplete: function (res) {
 
-                console.log(
-                    "CSRF Response:",
-                    res
-                );
+                console.log("CSRF Response:", res);
 
-                csrfToken =
-                    res.csrf.value;
+                csrfToken = res.csrf.value;
+
+                console.log("CSRF Token:", csrfToken);
 
                 loadProjects();
             },
@@ -88,15 +72,11 @@ function getCSRF() {
 
                 console.log(err);
 
-                alert(
-                    "Failed to get CSRF token"
-                );
+                alert("Failed to get CSRF token");
             }
         }
     );
 }
-
-
 
 /* ===========================
    LOAD PROJECTS
@@ -108,49 +88,36 @@ function loadProjects() {
         spaceUrl +
         "/resources/v1/modeler/projects";
 
+    console.log("Loading Projects:", url);
 
     WAFData.authenticatedRequest(
         url,
         {
-
             method: "GET",
-
             type: "json",
 
             headers: {
-
-                "Accept":
-                    "application/json"
+                "Accept": "application/json"
             },
-
 
             onComplete: function (res) {
 
-                console.log(
-                    "Projects Response:",
-                    res
-                );
+                console.log("Projects Response:", res);
 
-                projectData =
-                    res.data || [];
+                projectData = res.data || [];
 
                 buildUI();
             },
-
 
             onFailure: function (err) {
 
                 console.log(err);
 
-                alert(
-                    "Failed to load projects"
-                );
+                alert("Failed to load projects");
             }
         }
     );
 }
-
-
 
 /* ===========================
    UI
@@ -159,46 +126,29 @@ function loadProjects() {
 function buildUI() {
 
     widget.body.innerHTML =
-
-        "<div class='project-container'>" +
-
         "<h3>Project Editor</h3>" +
 
-        "<select id='projectList'></select>" +
+        "<select id='projectList' style='width:100%'></select>" +
 
         "<br/><br/>" +
 
         "<b>Title</b><br/>" +
-        "<input id='title' />" +
+        "<input id='title' style='width:100%' />" +
 
         "<br/><br/>" +
 
         "<b>Description</b><br/>" +
-        "<textarea id='description'></textarea>" +
+        "<textarea id='description' style='width:100%;height:100px'></textarea>" +
 
         "<br/><br/>" +
 
-        "<button id='btnUpdate'>" +
-        "Update Project" +
-        "</button>" +
+        "<button id='btnUpdate'>Update Project</button>";
 
-        "</div>";
-
-
-    document
-        .getElementById("projectList")
-        .onchange = showProject;
-
-
-    document
-        .getElementById("btnUpdate")
-        .onclick = updateProject;
-
+    document.getElementById("projectList").onchange = showProject;
+    document.getElementById("btnUpdate").onclick = updateProject;
 
     populateProjects();
 }
-
-
 
 /* ===========================
    DROPDOWN
@@ -207,42 +157,26 @@ function buildUI() {
 function populateProjects() {
 
     var ddl =
-        document.getElementById(
-            "projectList"
-        );
-
+        document.getElementById("projectList");
 
     ddl.innerHTML = "";
 
+    for (var i = 0; i < projectData.length; i++) {
 
-    for (
-        var i = 0;
-        i < projectData.length;
-        i++
-    ) {
-
-        var p =
-            projectData[i];
-
+        var p = projectData[i];
 
         var option =
-            document.createElement(
-                "option"
-            );
-
+            document.createElement("option");
 
         option.value = i;
-
 
         option.text =
             p.dataelements.title ||
             p.dataelements.name ||
             p.id;
 
-
         ddl.appendChild(option);
     }
-
 
     if (projectData.length > 0) {
 
@@ -252,8 +186,6 @@ function populateProjects() {
     }
 }
 
-
-
 /* ===========================
    SHOW PROJECT
 =========================== */
@@ -261,40 +193,29 @@ function populateProjects() {
 function showProject() {
 
     var index =
-        document.getElementById(
-            "projectList"
-        ).value;
-
+        document.getElementById("projectList").value;
 
     var p =
         projectData[index];
 
-
     if (!p)
         return;
-
 
     selectedProjectId =
         p.id;
 
-
     selectedProjectCestamp =
         p.cestamp;
 
+    console.log("Selected Project ID:", selectedProjectId);
+    console.log("Selected Cestamp:", selectedProjectCestamp);
 
-    document.getElementById(
-        "title"
-    ).value =
+    document.getElementById("title").value =
         p.dataelements.title || "";
 
-
-    document.getElementById(
-        "description"
-    ).value =
+    document.getElementById("description").value =
         p.dataelements.description || "";
 }
-
-
 
 /* ===========================
    UPDATE PROJECT
@@ -302,59 +223,48 @@ function showProject() {
 
 function updateProject() {
 
-
     if (!selectedProjectId) {
 
-        alert(
-            "Please select a project"
-        );
+        alert("Please select a project");
 
         return;
     }
-
 
     var payload = {
 
         data: [
 
             {
+                id: selectedProjectId,
 
-                id:
-                    selectedProjectId,
+                type: "Project Space",
 
-
-                type:
-                    "Project Space",
-
-
-                cestamp:
-                    selectedProjectCestamp,
-
+                cestamp: selectedProjectCestamp,
 
                 dataelements: {
 
                     title:
-                        document
-                        .getElementById("title")
-                        .value,
-
+                        document.getElementById("title").value,
 
                     description:
-                        document
-                        .getElementById("description")
-                        .value
+                        document.getElementById("description").value
                 }
             }
         ]
     };
-
 
     var updateUrl =
         spaceUrl +
         "/resources/v1/modeler/projects/" +
         selectedProjectId;
 
+    console.log("UPDATE URL:");
+    console.log(updateUrl);
 
+    console.log("PAYLOAD:");
+    console.log(
+        JSON.stringify(payload, null, 2)
+    );
 
     WAFData.authenticatedRequest(
         updateUrl,
@@ -364,53 +274,41 @@ function updateProject() {
 
             type: "json",
 
-
             headers: {
 
                 "ENO_CSRF_TOKEN":
                     csrfToken,
 
-
                 "Content-Type":
                     "application/json",
-
 
                 "Accept":
                     "application/json"
             },
 
-
             data:
                 JSON.stringify(payload),
 
-
-
             onComplete: function (res) {
-
 
                 console.log(
                     "UPDATE SUCCESS:",
                     res
                 );
 
-
                 alert(
                     "Project Updated Successfully"
                 );
 
-
                 loadProjects();
             },
 
-
             onFailure: function (err) {
-
 
                 console.log(
                     "UPDATE FAILED:",
                     err
                 );
-
 
                 alert(
                     "Update Failed. Check browser console."
