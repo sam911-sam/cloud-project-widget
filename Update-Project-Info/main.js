@@ -1,4 +1,4 @@
-```javascript
+
 var projectData = [];
 var selectedProjectId = null;
 var selectedProjectCestamp = null;
@@ -419,4 +419,3 @@ function updateProject() {
         }
     );
 }
-```
