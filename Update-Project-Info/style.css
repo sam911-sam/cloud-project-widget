@@ -1,0 +1,32 @@
+```css
+body {
+    font-family: Arial, sans-serif;
+    padding: 10px;
+}
+
+.project-container {
+    width: 100%;
+}
+
+.project-container h3 {
+    margin-bottom: 15px;
+}
+
+.project-container select,
+.project-container input,
+.project-container textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px;
+}
+
+.project-container textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+.project-container button {
+    padding: 8px 15px;
+    cursor: pointer;
+}
+```
