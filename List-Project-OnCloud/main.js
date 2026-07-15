@@ -17,32 +17,39 @@ var projectData = [];
             console.log("Project Browser Loaded");
 
             widget.body.innerHTML =
-                '<div class="card">' + '<h3>Projects</h3>' + '</div>' +
+                '<div class="card">' +
+                    '<h3>Projects</h3>' +
+                '</div>' +
 
                 '<select id="projectList">' +
-                '<option>Loading...</option>' +
+                    '<option>Loading...</option>' +
                 '</select>' +
 
                 '<hr>' +
 
                 '<div class="field">' +
-                '<span class="label">Title:</span> ' +
-                '<span id="title"></span>' +
+                    '<span class="label">Title:</span> ' +
+                    '<span id="title"></span>' +
                 '</div>' +
 
                 '<div class="field">' +
-                '<span class="label">Name:</span> ' +
-                '<span id="name"></span>' +
+                    '<span class="label">Name:</span> ' +
+                    '<span id="name"></span>' +
                 '</div>' +
 
                 '<div class="field">' +
-                '<span class="label">Description:</span> ' +
-                '<span id="description"></span>' +
+                    '<span class="label">Description:</span> ' +
+                    '<span id="description"></span>' +
                 '</div>' +
 
                 '<div class="field">' +
-                '<span class="label">State:</span> ' +
-                '<span id="state"></span>' +
+                    '<span class="label">State:</span> ' +
+                    '<span id="state"></span>' +
+                '</div>' +
+
+                '<div class="field">' +
+                    '<span class="label">Owner:</span> ' +
+                    '<span id="owner"></span>' +
                 '</div>';
 
             loadProjects();
@@ -68,13 +75,11 @@ function loadProjects() {
 
             CompassServices.getPlatformServices({
 
-                platformId:
-                    widget.getValue("x3dPlatformId"),
+                platformId: widget.getValue("x3dPlatformId"),
 
                 onComplete: function (services) {
 
-                    var spaceUrl =
-                        services["3DSpace"];
+                    var spaceUrl = services["3DSpace"];
 
                     getProjects(
                         WAFData,
@@ -102,9 +107,10 @@ function getProjects(
     spaceUrl
 ) {
 
+    // Include owner information
     var projectUrl =
         spaceUrl +
-        "/resources/v1/modeler/projects";
+        "/resources/v1/modeler/projects?$include=ownerInfo";
 
     WAFData.authenticatedRequest(
         projectUrl,
@@ -119,10 +125,10 @@ function getProjects(
 
             onComplete: function (response) {
 
+                console.log("Projects Response:");
                 console.log(response);
 
-                projectData =
-                    response.data || [];
+                projectData = response.data || [];
 
                 populateProjects();
 
@@ -144,9 +150,7 @@ function getProjects(
 function populateProjects() {
 
     var ddl =
-        document.getElementById(
-            "projectList"
-        );
+        document.getElementById("projectList");
 
     ddl.innerHTML = "";
 
@@ -156,13 +160,10 @@ function populateProjects() {
         i++
     ) {
 
-        var project =
-            projectData[i];
+        var project = projectData[i];
 
         var option =
-            document.createElement(
-                "option"
-            );
+            document.createElement("option");
 
         option.value = i;
 
@@ -175,8 +176,7 @@ function populateProjects() {
 
     }
 
-    ddl.onchange =
-        showProject;
+    ddl.onchange = showProject;
 
     if (projectData.length > 0) {
 
@@ -191,35 +191,46 @@ function populateProjects() {
 function showProject() {
 
     var index =
-        document.getElementById(
-            "projectList"
-        ).value;
+        document.getElementById("projectList").value;
 
-    var project =
-        projectData[index];
+    var project = projectData[index];
 
     if (!project)
         return;
 
-    document.getElementById(
-        "title"
-    ).innerHTML =
+    document.getElementById("title").innerHTML =
         project.dataelements.title || "";
 
-    document.getElementById(
-        "name"
-    ).innerHTML =
+    document.getElementById("name").innerHTML =
         project.dataelements.name || "";
 
-    document.getElementById(
-        "description"
-    ).innerHTML =
+    document.getElementById("description").innerHTML =
         project.dataelements.description || "";
 
-    document.getElementById(
-        "state"
-    ).innerHTML =
+    document.getElementById("state").innerHTML =
         project.dataelements.state || "";
+
+    // Get owner information
+    var owner = "-";
+
+    if (
+        project.relateddata &&
+        project.relateddata.ownerInfo &&
+        project.relateddata.ownerInfo.length > 0
+    ) {
+
+        var o =
+            project.relateddata.ownerInfo[0].dataelements || {};
+
+        owner =
+            ((o.firstname || "") + " " + (o.lastname || "")).trim();
+
+        if (!owner) {
+            owner = o.name || "-";
+        }
+    }
+
+    document.getElementById("owner").innerHTML = owner;
 
     widget.setTitle(
         project.dataelements.title || "Project Browser"
