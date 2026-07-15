@@ -1,4 +1,5 @@
 console.log("main.js loaded");
+
 var projectData = [];
 var selectedProjectId = null;
 var selectedProjectCestamp = null;
@@ -31,7 +32,9 @@ widget.addEvent("onLoad", function () {
             },
 
             onFailure: function (err) {
+
                 console.log(err);
+
                 alert("Failed to get platform services");
             }
         });
@@ -121,7 +124,7 @@ function loadProjects() {
 }
 
 /* ===========================
-   UI
+   BUILD UI
 =========================== */
 
 function buildUI() {
@@ -129,17 +132,17 @@ function buildUI() {
     widget.body.innerHTML =
         "<h3>Project Editor</h3>" +
 
-        "<select id='projectList' style='width:100%'></select>" +
+        "<select id='projectList'></select>" +
 
         "<br/><br/>" +
 
         "<b>Title</b><br/>" +
-        "<input id='title' style='width:100%' />" +
+        "<input id='title' />" +
 
         "<br/><br/>" +
 
         "<b>Description</b><br/>" +
-        "<textarea id='description' style='width:100%;height:100px'></textarea>" +
+        "<textarea id='description'></textarea>" +
 
         "<br/><br/>" +
 
@@ -152,13 +155,12 @@ function buildUI() {
 }
 
 /* ===========================
-   DROPDOWN
+   POPULATE DROPDOWN
 =========================== */
 
 function populateProjects() {
 
-    var ddl =
-        document.getElementById("projectList");
+    var ddl = document.getElementById("projectList");
 
     ddl.innerHTML = "";
 
@@ -166,8 +168,7 @@ function populateProjects() {
 
         var p = projectData[i];
 
-        var option =
-            document.createElement("option");
+        var option = document.createElement("option");
 
         option.value = i;
 
@@ -196,17 +197,13 @@ function showProject() {
     var index =
         document.getElementById("projectList").value;
 
-    var p =
-        projectData[index];
+    var p = projectData[index];
 
     if (!p)
         return;
 
-    selectedProjectId =
-        p.id;
-
-    selectedProjectCestamp =
-        p.cestamp;
+    selectedProjectId = p.id;
+    selectedProjectCestamp = p.cestamp;
 
     console.log("Selected Project ID:", selectedProjectId);
     console.log("Selected Cestamp:", selectedProjectCestamp);
@@ -234,7 +231,6 @@ function updateProject() {
     var payload = {
 
         data: [
-
             {
                 id: selectedProjectId,
 
@@ -263,57 +259,40 @@ function updateProject() {
     console.log(updateUrl);
 
     console.log("PAYLOAD:");
-    console.log(
-        JSON.stringify(payload, null, 2)
-    );
+    console.log(JSON.stringify(payload, null, 2));
 
     WAFData.authenticatedRequest(
         updateUrl,
         {
-
             method: "PUT",
 
             type: "json",
 
             headers: {
 
-                "ENO_CSRF_TOKEN":
-                    csrfToken,
+                "ENO_CSRF_TOKEN": csrfToken,
 
-                "Content-Type":
-                    "application/json",
+                "Content-Type": "application/json",
 
-                "Accept":
-                    "application/json"
+                "Accept": "application/json"
             },
 
-            data:
-                JSON.stringify(payload),
+            data: JSON.stringify(payload),
 
             onComplete: function (res) {
 
-                console.log(
-                    "UPDATE SUCCESS:",
-                    res
-                );
+                console.log("UPDATE SUCCESS:", res);
 
-                alert(
-                    "Project Updated Successfully"
-                );
+                alert("Project Updated Successfully");
 
                 loadProjects();
             },
 
             onFailure: function (err) {
 
-                console.log(
-                    "UPDATE FAILED:",
-                    err
-                );
+                console.log("UPDATE FAILED:", err);
 
-                alert(
-                    "Update Failed. Check browser console."
-                );
+                alert("Update Failed. Check browser console.");
             }
         }
     );
