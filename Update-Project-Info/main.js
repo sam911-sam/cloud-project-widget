@@ -274,62 +274,47 @@ function loadProjects() {
 /* ===========================
    BUILD UI
 =========================== */
-
-
 function buildUI() {
 
-
     widget.body.innerHTML =
-<div class="enovia-panel">
-    <div class="panel-header">
-        <span class="panel-title">Project Editor</span>
-    </div>
 
-    <div class="panel-body">
+        '<div class="enovia-panel">' +
 
-        <div class="form-row">
-            <label>Select Project</label>
-            <select id="projectList"></select>
-        </div>
+            '<div class="panel-header">' +
+                '<span class="panel-title">Project Editor</span>' +
+            '</div>' +
 
-        <div class="form-row">
-            <label>Project Title</label>
-            <input id="title">
-        </div>
+            '<div class="panel-body">' +
 
-        <div class="form-row">
-            <label>Description</label>
-            <textarea id="description"></textarea>
-        </div>
+                '<div class="form-row">' +
+                    '<label>Select Project</label>' +
+                    '<select id="projectList"></select>' +
+                '</div>' +
 
-        <div class="button-bar">
-            <button id="btnUpdate" class="primary-btn">
-                Update Project
-            </button>
-        </div>
+                '<div class="form-row">' +
+                    '<label>Project Title</label>' +
+                    '<input id="title" type="text">' +
+                '</div>' +
 
-    </div>
-</div>
+                '<div class="form-row">' +
+                    '<label>Description</label>' +
+                    '<textarea id="description"></textarea>' +
+                '</div>' +
 
-           
+                '<div class="button-bar">' +
+                    '<button id="btnUpdate" class="primary-btn">' +
+                        'Update Project' +
+                    '</button>' +
+                '</div>' +
 
+            '</div>' +
 
+        '</div>';
 
-    document
-        .getElementById("projectList")
-        .onchange = showProject;
-
-
-
-    document
-        .getElementById("btnUpdate")
-        .onclick = updateProject;
-
-
+    document.getElementById("projectList").onchange = showProject;
+    document.getElementById("btnUpdate").onclick = updateProject;
 
     populateProjects();
-
-
 }
 
 
