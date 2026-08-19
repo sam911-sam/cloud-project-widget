@@ -280,50 +280,38 @@ function buildUI() {
 
 
     widget.body.innerHTML =
+<div class="enovia-panel">
+    <div class="panel-header">
+        <span class="panel-title">Project Editor</span>
+    </div>
 
-        '<div class="card">' +
+    <div class="panel-body">
 
-            '<h3>Project Editor</h3>' +
+        <div class="form-row">
+            <label>Select Project</label>
+            <select id="projectList"></select>
+        </div>
 
-        '</div>' +
+        <div class="form-row">
+            <label>Project Title</label>
+            <input id="title">
+        </div>
 
+        <div class="form-row">
+            <label>Description</label>
+            <textarea id="description"></textarea>
+        </div>
 
-        '<select id="projectList">' +
+        <div class="button-bar">
+            <button id="btnUpdate" class="primary-btn">
+                Update Project
+            </button>
+        </div>
 
-            '<option>Loading...</option>' +
+    </div>
+</div>
 
-        '</select>' +
-
-
-        '<br><br>' +
-
-
-        '<div class="field">' +
-
-            '<div class="label">Title</div>' +
-
-            '<input id="title">' +
-
-        '</div>' +
-
-
-        '<div class="field">' +
-
-            '<div class="label">Description</div>' +
-
-            '<textarea id="description"></textarea>' +
-
-        '</div>' +
-
-
-        '<br>' +
-
-
-        '<button id="btnUpdate">' +
-
-            'Update Project' +
-
-        '</button>';
+           
 
 
 
