@@ -1,21 +1,40 @@
-/* ============================================================
-   TEMPLATE SEARCH ROW
-   ============================================================ */
-
-.dxp-template-search-row {
-    display: flex;
-    gap: 6px;
-    width: 100%;
+.dxp-container {
+    background: #f5f6f8;
+    padding: 10px;
+    font-family: "Segoe UI", Arial, sans-serif;
 }
 
+.dxp-header {
+    background: #ffffff;
+    padding: 10px 12px;
+    font-size: 15px;
+    font-weight: 600;
+    border-left: 4px solid #0076ff;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    margin-bottom: 10px;
+}
 
-/* ============================================================
-   TEMPLATE SEARCH INPUT
-   ============================================================ */
+.dxp-form {
+    background: #ffffff;
+    padding: 14px;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
 
-.dxp-template-search-row input {
-    flex: 1;
-    min-width: 0;
+.dxp-field {
+    margin-bottom: 12px;
+}
+
+.dxp-field label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #444;
+}
+
+.dxp-field input {
+    width: 100%;
     padding: 10px;
     border: 1px solid #d6dbe1;
     border-radius: 6px;
@@ -25,17 +44,38 @@
     transition: 0.2s;
 }
 
-.dxp-template-search-row input:focus {
+.dxp-field input:focus {
     border-color: #0076ff;
     box-shadow: 0 0 0 2px rgba(0,118,255,0.15);
 }
 
 
 /* ============================================================
-   SEARCH BUTTON
+   SEARCH ROW
    ============================================================ */
 
-#searchTemplateBtn {
+.dxp-search-row {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.dxp-search-row input {
+    flex: 1;
+    width: auto;
+}
+
+.dxp-search-btn {
+    width: 90px;
+    flex-shrink: 0;
+}
+
+
+/* ============================================================
+   BUTTON
+   ============================================================ */
+
+button {
     background: #0076ff;
     color: white;
     border: none;
@@ -43,38 +83,38 @@
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
-    white-space: nowrap;
     transition: 0.2s;
 }
 
-#searchTemplateBtn:hover {
+button:hover {
     background: #005ed1;
+}
+
+button:active {
+    background: #004ca8;
 }
 
 
 /* ============================================================
-   TEMPLATE RESULT LIST
+   TEMPLATE LIST
    ============================================================ */
 
 .dxp-template-list {
-    margin-top: 6px;
     border: 1px solid #d6dbe1;
     border-radius: 6px;
     background: #ffffff;
-    max-height: 220px;
+    max-height: 180px;
     overflow-y: auto;
 }
 
 
-/* ============================================================
-   TEMPLATE RESULT ITEM
-   ============================================================ */
+/* Individual template */
 
 .dxp-template-item {
     padding: 10px 12px;
-    border-bottom: 1px solid #edf0f2;
+    border-bottom: 1px solid #e5e8eb;
     cursor: pointer;
-    transition: 0.15s;
+    transition: background 0.15s;
 }
 
 .dxp-template-item:last-child {
@@ -82,26 +122,27 @@
 }
 
 .dxp-template-item:hover {
-    background: #f5f8fc;
+    background: #f0f6ff;
+}
+
+.dxp-template-item.selected {
+    background: #e6f1ff;
+    border-left: 3px solid #0076ff;
 }
 
 
-/* ============================================================
-   TEMPLATE TITLE
-   ============================================================ */
+/* Template name */
 
 .dxp-template-title {
     font-size: 14px;
     font-weight: 600;
-    color: #444;
+    color: #333;
 }
 
 
-/* ============================================================
-   TEMPLATE REVISION
-   ============================================================ */
+/* Template description */
 
-.dxp-template-revision {
+.dxp-template-info {
     margin-top: 3px;
     font-size: 12px;
     color: #777;
@@ -109,76 +150,46 @@
 
 
 /* ============================================================
-   TEMPLATE DESCRIPTION
+   EMPTY / LOADING
    ============================================================ */
 
-.dxp-template-description {
-    margin-top: 3px;
-    font-size: 12px;
-    color: #666;
-
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-
-/* ============================================================
-   SELECTED TEMPLATE
-   ============================================================ */
-
-.dxp-selected-template {
-    margin-top: 7px;
-    padding: 8px 10px;
-    background: #f5f8fc;
-    border: 1px solid #d6dbe1;
-    border-radius: 6px;
+.dxp-empty {
+    padding: 12px;
     font-size: 13px;
-    color: #444;
+    color: #777;
+    text-align: center;
 }
-
-.dxp-selected-label {
-    font-weight: 600;
-    color: #0076ff;
-}
-
-
-/* ============================================================
-   LOADING
-   ============================================================ */
 
 .dxp-loading {
-    margin-top: 6px;
-    padding: 8px;
+    padding: 12px;
     font-size: 13px;
-    color: #777;
+    color: #0076ff;
+    text-align: center;
 }
 
 
 /* ============================================================
-   NO RESULTS
+   ACTIONS
    ============================================================ */
 
-.dxp-no-results {
-    padding: 10px;
-    font-size: 13px;
-    color: #777;
+.dxp-actions {
+    margin-top: 10px;
 }
 
 
 /* ============================================================
-   ERROR
+   RESULT
    ============================================================ */
 
-.error {
-    color: #d93025;
+#result {
+    margin-top: 12px;
+    font-weight: 600;
 }
-
-
-/* ============================================================
-   SUCCESS
-   ============================================================ */
 
 .success {
     color: #1a7f37;
+}
+
+.error {
+    color: #d93025;
 }
