@@ -1,28 +1,80 @@
 /* ============================================================
-   TEMPLATE SEARCH
+   TEMPLATE SEARCH ROW
    ============================================================ */
 
-.dxp-template-results {
-    position: relative;
-    background: #ffffff;
-    border: 1px solid #d6dbe1;
-    border-radius: 6px;
-    margin-top: 4px;
-    max-height: 220px;
-    overflow-y: auto;
-    z-index: 1000;
+.dxp-template-search-row {
+    display: flex;
+    gap: 6px;
+    width: 100%;
 }
 
 
 /* ============================================================
-   TEMPLATE ITEM
+   TEMPLATE SEARCH INPUT
+   ============================================================ */
+
+.dxp-template-search-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px;
+    border: 1px solid #d6dbe1;
+    border-radius: 6px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    transition: 0.2s;
+}
+
+.dxp-template-search-row input:focus {
+    border-color: #0076ff;
+    box-shadow: 0 0 0 2px rgba(0,118,255,0.15);
+}
+
+
+/* ============================================================
+   SEARCH BUTTON
+   ============================================================ */
+
+#searchTemplateBtn {
+    background: #0076ff;
+    color: white;
+    border: none;
+    padding: 10px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+#searchTemplateBtn:hover {
+    background: #005ed1;
+}
+
+
+/* ============================================================
+   TEMPLATE RESULT LIST
+   ============================================================ */
+
+.dxp-template-list {
+    margin-top: 6px;
+    border: 1px solid #d6dbe1;
+    border-radius: 6px;
+    background: #ffffff;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+
+/* ============================================================
+   TEMPLATE RESULT ITEM
    ============================================================ */
 
 .dxp-template-item {
     padding: 10px 12px;
     border-bottom: 1px solid #edf0f2;
     cursor: pointer;
-    transition: background 0.15s;
+    transition: 0.15s;
 }
 
 .dxp-template-item:last-child {
@@ -30,7 +82,7 @@
 }
 
 .dxp-template-item:hover {
-    background: #f1f6ff;
+    background: #f5f8fc;
 }
 
 
@@ -41,18 +93,18 @@
 .dxp-template-title {
     font-size: 14px;
     font-weight: 600;
-    color: #222;
+    color: #444;
 }
 
 
 /* ============================================================
-   TEMPLATE DETAILS
+   TEMPLATE REVISION
    ============================================================ */
 
-.dxp-template-details {
-    font-size: 12px;
-    color: #687078;
+.dxp-template-revision {
     margin-top: 3px;
+    font-size: 12px;
+    color: #777;
 }
 
 
@@ -61,9 +113,9 @@
    ============================================================ */
 
 .dxp-template-description {
+    margin-top: 3px;
     font-size: 12px;
-    color: #555;
-    margin-top: 4px;
+    color: #666;
 
     white-space: nowrap;
     overflow: hidden;
@@ -76,13 +128,13 @@
    ============================================================ */
 
 .dxp-selected-template {
-    margin-top: 6px;
-    padding: 7px 9px;
-    background: #eef6ff;
-    border-left: 3px solid #0076ff;
-    border-radius: 4px;
-    font-size: 12px;
-    color: #333;
+    margin-top: 7px;
+    padding: 8px 10px;
+    background: #f5f8fc;
+    border: 1px solid #d6dbe1;
+    border-radius: 6px;
+    font-size: 13px;
+    color: #444;
 }
 
 .dxp-selected-label {
@@ -92,22 +144,41 @@
 
 
 /* ============================================================
-   NO RESULTS
+   LOADING
    ============================================================ */
 
-.dxp-no-results {
-    padding: 12px;
+.dxp-loading {
+    margin-top: 6px;
+    padding: 8px;
     font-size: 13px;
     color: #777;
 }
 
 
 /* ============================================================
-   SEARCH ERROR
+   NO RESULTS
    ============================================================ */
 
-.dxp-template-error {
-    padding: 12px;
+.dxp-no-results {
+    padding: 10px;
     font-size: 13px;
+    color: #777;
+}
+
+
+/* ============================================================
+   ERROR
+   ============================================================ */
+
+.error {
     color: #d93025;
+}
+
+
+/* ============================================================
+   SUCCESS
+   ============================================================ */
+
+.success {
+    color: #1a7f37;
 }
