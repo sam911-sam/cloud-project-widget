@@ -23,25 +23,59 @@
 
                     '<div class="dxp-form">' +
 
+                        // TEMPLATE SEARCH
                         '<div class="dxp-field">' +
                             '<label>Project Template</label>' +
-                            '<select id="projectTemplate">' +
-                                '<option value="">Loading templates...</option>' +
-                            '</select>' +
+
+                            '<div class="dxp-search-row">' +
+
+                                '<input ' +
+                                    'id="templateSearch" ' +
+                                    'placeholder="Enter template name..." ' +
+                                    'autocomplete="off">' +
+
+                                '<button ' +
+                                    'id="searchTemplateBtn" ' +
+                                    'class="dxp-search-button">' +
+                                    'Search' +
+                                '</button>' +
+
+                            '</div>' +
                         '</div>' +
 
+                        // TEMPLATE LIST
+                        '<div class="dxp-field">' +
+                            '<label>Select Template</label>' +
+
+                            '<select id="projectTemplate">' +
+                                '<option value="">Search for a template first</option>' +
+                            '</select>' +
+
+                        '</div>' +
+
+                        // PROJECT NAME
                         '<div class="dxp-field">' +
                             '<label>Project Name</label>' +
-                            '<input id="projectName" placeholder="Enter project name">' +
+                            '<input ' +
+                                'id="projectName" ' +
+                                'placeholder="Enter project name">' +
                         '</div>' +
 
+                        // DESCRIPTION
                         '<div class="dxp-field">' +
                             '<label>Description</label>' +
-                            '<input id="projectDescription" placeholder="Enter description">' +
+                            '<input ' +
+                                'id="projectDescription" ' +
+                                'placeholder="Enter description">' +
                         '</div>' +
 
+                        // CREATE BUTTON
                         '<div class="dxp-actions">' +
-                            '<button id="createBtn">Create Project</button>' +
+                            '<button ' +
+                                'id="createBtn" ' +
+                                'class="dxp-create-button">' +
+                                'Create Project' +
+                            '</button>' +
                         '</div>' +
 
                         '<div id="result"></div>' +
@@ -49,6 +83,12 @@
                     '</div>' +
 
                 '</div>';
+
+
+            // BUTTON EVENTS
+
+            document.getElementById("searchTemplateBtn").onclick =
+                searchTemplateButtonClicked;
 
             document.getElementById("createBtn").onclick =
                 createProjectFromTemplate;
@@ -64,15 +104,17 @@
 
 
 /*
- * Global variables
+ * GLOBAL VARIABLES
  */
+
 var projectSpaceUrl = null;
 var csrfToken = null;
 
 
 /*
- * Initialize widget
+ * INITIALIZE
  */
+
 function initialize() {
 
     console.log("Initializing widget...");
@@ -82,20 +124,23 @@ function initialize() {
             "DS/WAFData/WAFData",
             "DS/i3DXCompassServices/i3DXCompassServices"
         ],
+
         function (WAFData, CompassServices) {
 
             console.log("Modules Loaded");
 
             CompassServices.getPlatformServices({
 
-                platformId: widget.getValue("x3dPlatformId"),
+                platformId:
+                    widget.getValue("x3dPlatformId"),
 
                 onComplete: function (services) {
 
-                    console.log("Platform services received");
+                    console.log("Services Received");
                     console.log(services);
 
-                    projectSpaceUrl = services["3DSpace"];
+                    projectSpaceUrl =
+                        services["3DSpace"];
 
                     console.log(
                         "3DSpace URL:",
@@ -106,7 +151,6 @@ function initialize() {
                         WAFData,
                         projectSpaceUrl
                     );
-
                 },
 
                 onFailure: function (error) {
@@ -121,17 +165,16 @@ function initialize() {
                         "Unable to get 3DSpace service."
                     );
                 }
-
             });
-
         }
     );
 }
 
 
 /*
- * Get CSRF token
+ * GET CSRF TOKEN
  */
+
 function getCSRFToken(
     WAFData,
     spaceUrl
@@ -146,7 +189,9 @@ function getCSRFToken(
     WAFData.authenticatedRequest(
         csrfUrl,
         {
+
             method: "GET",
+
             type: "json",
 
             onComplete: function (response) {
@@ -165,14 +210,6 @@ function getCSRFToken(
 
                     console.log(
                         "CSRF Token received"
-                    );
-
-                    /*
-                     * Now load project templates
-                     */
-                    searchProjectTemplates(
-                        WAFData,
-                        spaceUrl
                     );
 
                 } else {
@@ -198,24 +235,78 @@ function getCSRFToken(
 
 
 /*
- * Search Project Templates
+ * SEARCH BUTTON CLICK
  */
+
+function searchTemplateButtonClicked() {
+
+    var searchText =
+        document.getElementById(
+            "templateSearch"
+        ).value.trim();
+
+    console.log(
+        "Searching Template:",
+        searchText
+    );
+
+
+    /*
+     * API requires minimum 2 characters
+     */
+
+    if (searchText.length < 2) {
+
+        showError(
+            "Enter at least 2 characters to search."
+        );
+
+        return;
+    }
+
+
+    if (!projectSpaceUrl) {
+
+        showError(
+            "3DSpace URL is not available."
+        );
+
+        return;
+    }
+
+
+    require(
+        [
+            "DS/WAFData/WAFData"
+        ],
+
+        function (WAFData) {
+
+            searchProjectTemplates(
+                WAFData,
+                projectSpaceUrl,
+                searchText
+            );
+
+        }
+    );
+}
+
+
+/*
+ * SEARCH PROJECT TEMPLATES
+ */
+
 function searchProjectTemplates(
     WAFData,
-    spaceUrl
+    spaceUrl,
+    searchText
 ) {
 
     console.log(
         "Searching project templates..."
     );
 
-    /*
-     * We need at least 2 characters.
-     *
-     * Change this if you know part of
-     * your template name.
-     */
-    var searchText = "Project";
 
     var templateUrl =
         spaceUrl +
@@ -224,19 +315,31 @@ function searchProjectTemplates(
         encodeURIComponent(searchText) +
         "&$top=100";
 
+
     console.log(
         "Template Search URL:",
         templateUrl
     );
 
+
+    showInfo(
+        "Searching templates..."
+    );
+
+
     WAFData.authenticatedRequest(
         templateUrl,
         {
+
             method: "GET",
+
             type: "json",
 
             headers: {
-                "Accept": "application/json"
+
+                "Accept":
+                    "application/json"
+
             },
 
             onComplete: function (response) {
@@ -261,7 +364,7 @@ function searchProjectTemplates(
                 console.log(error);
 
                 showError(
-                    "Unable to load project templates."
+                    "Template search failed."
                 );
             }
         }
@@ -270,18 +373,19 @@ function searchProjectTemplates(
 
 
 /*
- * Populate template dropdown
+ * POPULATE TEMPLATE LIST
  */
+
 function populateTemplates(response) {
 
     var select =
         document.getElementById(
             "projectTemplate"
         );
-        document.getElementById("projectTemplate");
 
-    select.innerHTML =
-        '<option value="">Select Project Template</option>';
+
+    select.innerHTML = "";
+
 
     if (
         !response ||
@@ -291,81 +395,122 @@ function populateTemplates(response) {
 
         select.innerHTML =
             '<option value="">No templates found</option>';
-            '<option value="">No project templates found</option>';
 
-        showError("No project templates found.");
+        showError(
+            "No project templates found."
+        );
 
         return;
     }
 
-    console.log("ALL SEARCH RESULTS:");
-    console.log(response.data);
+
+    console.log(
+        "ALL SEARCH RESULTS:",
+        response.data
+    );
 
 
     /*
-     * Keep ONLY Project Template objects
+     * Filter Project Template objects
      */
+
     var projectTemplates =
         response.data.filter(function (template) {
 
             console.log(
-                "Object:",
+                "Template:",
                 template.id,
                 "Type:",
                 template.type
             );
 
             return (
-                template.type === "Project Template"
+                template.type ===
+                "Project Template"
             );
 
         });
 
 
-    console.log(
-        "FILTERED PROJECT TEMPLATES:"
-    );
+    /*
+     * If API returns objects with a different
+     * type, temporarily show all objects.
+     *
+     * This is useful for checking your actual
+     * 3DEXPERIENCE response.
+     */
 
-    console.log(projectTemplates);
+    if (projectTemplates.length === 0) {
+
+        console.log(
+            "No objects with type 'Project Template'."
+        );
+
+        console.log(
+            "Using returned objects directly."
+        );
+
+        projectTemplates =
+            response.data;
+    }
 
 
     if (projectTemplates.length === 0) {
 
         select.innerHTML =
-            '<option value="">No Project Template objects found</option>';
+            '<option value="">No templates found</option>';
 
         showError(
             "No project templates found."
-            "Search returned objects, but none are Project Template type."
         );
 
         return;
     }
 
-    response.data.forEach(
 
     /*
-     * Add only Project Template objects
+     * Default option
      */
+
+    var defaultOption =
+        document.createElement("option");
+
+    defaultOption.value = "";
+
+    defaultOption.text =
+        "Select Project Template";
+
+    select.appendChild(
+        defaultOption
+    );
+
+
+    /*
+     * Add templates
+     */
+
     projectTemplates.forEach(
         function (template) {
 
             var option =
                 document.createElement("option");
 
+
             /*
-             * Important:
-             * We use the actual template ID returned
-             * by the search API.
+             * IMPORTANT:
+             * Actual object ID from API
              */
+
             option.value =
                 template.id;
 
+
             /*
-             * Prefer title, otherwise name.
+             * Get display name
              */
 
             var title = "";
+
 
             if (
                 template.dataelements &&
@@ -395,48 +540,56 @@ function populateTemplates(response) {
 
 
             /*
-             * Keep the entire template object
-             * available on the option.
-             * Store complete object
+             * Keep original object
              */
+
             option.templateObject =
                 template;
 
 
-            select.appendChild(option);
+            select.appendChild(
+                option
+            );
 
         }
     );
 
 
     console.log(
-        "Templates loaded:",
-        response.data.length
         "Project Templates loaded:",
         projectTemplates.length
+    );
+
+
+    showSuccess(
+        projectTemplates.length +
+        " template(s) found."
     );
 }
 
 
-
 /*
- * Create Project From Template
+ * CREATE PROJECT FROM TEMPLATE
  */
+
 function createProjectFromTemplate() {
 
     console.log(
         "Create Project From Template clicked"
     );
 
+
     var templateId =
         document.getElementById(
             "projectTemplate"
         ).value;
 
+
     var projectName =
         document.getElementById(
             "projectName"
         ).value.trim();
+
 
     var description =
         document.getElementById(
@@ -445,8 +598,9 @@ function createProjectFromTemplate() {
 
 
     /*
-     * Validation
+     * VALIDATION
      */
+
     if (!templateId) {
 
         showError(
@@ -455,6 +609,7 @@ function createProjectFromTemplate() {
 
         return;
     }
+
 
     if (!projectName) {
 
@@ -490,6 +645,7 @@ function createProjectFromTemplate() {
         [
             "DS/WAFData/WAFData"
         ],
+
         function (WAFData) {
 
             createProjectRequest(
@@ -507,8 +663,9 @@ function createProjectFromTemplate() {
 
 
 /*
- * POST /projects/fromTemplate
+ * CREATE PROJECT REQUEST
  */
+
 function createProjectRequest(
     WAFData,
     spaceUrl,
@@ -518,12 +675,11 @@ function createProjectRequest(
     description
 ) {
 
+
     /*
-     * IMPORTANT
-     *
-     * The Project Template reference must contain
-     * the actual template ID.
+     * PAYLOAD FROM YOUR API
      */
+
     var payload = {
 
         data: [
@@ -534,9 +690,7 @@ function createProjectRequest(
 
                 dataelements: {
 
-                    title: projectName,
-
-                    description: description,
+                    constraintDate: "",
 
                     scheduleFrom:
                         "Project Start Date",
@@ -545,7 +699,13 @@ function createProjectRequest(
                         "As Soon As Possible",
 
                     currency:
-                        "Unassigned"
+                        "Unassigned",
+
+                    title:
+                        projectName,
+
+                    description:
+                        description
 
                 },
 
@@ -555,9 +715,11 @@ function createProjectRequest(
 
                         {
 
-                            id: templateId,
+                            id:
+                                templateId,
 
-                            type: "Project Template"
+                            type:
+                                "Project Template"
 
                         }
 
@@ -573,7 +735,7 @@ function createProjectRequest(
 
 
     console.log(
-        "================================="
+        "================================"
     );
 
     console.log(
@@ -583,6 +745,16 @@ function createProjectRequest(
     console.log(
         "Template ID:",
         templateId
+    );
+
+    console.log(
+        "Project Name:",
+        projectName
+    );
+
+    console.log(
+        "Description:",
+        description
     );
 
     console.log(
@@ -598,9 +770,13 @@ function createProjectRequest(
     );
 
     console.log(
-        "================================="
+        "================================"
     );
 
+
+    /*
+     * POST ENDPOINT
+     */
 
     var projectUrl =
         spaceUrl +
@@ -646,9 +822,23 @@ function createProjectRequest(
 
                 console.log(response);
 
+
                 showSuccess(
                     "Project Created Successfully From Template"
                 );
+
+
+                /*
+                 * Clear fields
+                 */
+
+                document.getElementById(
+                    "projectName"
+                ).value = "";
+
+                document.getElementById(
+                    "projectDescription"
+                ).value = "";
 
             },
 
@@ -661,12 +851,10 @@ function createProjectRequest(
 
                 console.log(error);
 
-                /*
-                 * Try to display the actual
-                 * server response.
-                 */
+
                 var message =
                     "PROJECT CREATION FAILED";
+
 
                 if (error) {
 
@@ -686,8 +874,10 @@ function createProjectRequest(
                     }
                 }
 
-                showError(message);
 
+                showError(
+                    message
+                );
             }
 
         }
@@ -696,15 +886,20 @@ function createProjectRequest(
 
 
 /*
- * Success message
+ * SUCCESS MESSAGE
  */
+
 function showSuccess(message) {
 
     var result =
-        document.getElementById("result");
+        document.getElementById(
+            "result"
+        );
+
 
     result.className =
         "success";
+
 
     result.innerHTML =
         message;
@@ -712,15 +907,41 @@ function showSuccess(message) {
 
 
 /*
- * Error message
+ * ERROR MESSAGE
  */
+
 function showError(message) {
 
     var result =
-        document.getElementById("result");
+        document.getElementById(
+            "result"
+        );
+
 
     result.className =
         "error";
+
+
+    result.innerHTML =
+        message;
+}
+
+
+/*
+ * INFO MESSAGE
+ */
+
+function showInfo(message) {
+
+    var result =
+        document.getElementById(
+            "result"
+        );
+
+
+    result.className =
+        "info";
+
 
     result.innerHTML =
         message;
