@@ -501,10 +501,45 @@ function createProjectRequest(
 ) {
 
     /*
-     * IMPORTANT
+     * Get the selected template object
+     */
+    var select =
+        document.getElementById("projectTemplate");
+
+    var selectedOption =
+        select.options[select.selectedIndex];
+
+    var templateObject =
+        selectedOption.templateObject;
+
+
+    console.log("SELECTED TEMPLATE OBJECT:");
+    console.log(templateObject);
+
+
+    /*
+     * IMPORTANT:
+     * Use the actual type returned by ENOVIA.
+     */
+    var templateType =
+        templateObject.type;
+
+
+    console.log(
+        "Template ID:",
+        templateId
+    );
+
+    console.log(
+        "Template Type:",
+        templateType
+    );
+
+
+    /*
+     * Build payload according to:
      *
-     * The Project Template reference must contain
-     * the actual template ID.
+     * POST /projects/fromTemplate
      */
     var payload = {
 
@@ -539,7 +574,7 @@ function createProjectRequest(
 
                             id: templateId,
 
-                            type: "Project Template"
+                            type: templateType
 
                         }
 
@@ -555,20 +590,11 @@ function createProjectRequest(
 
 
     console.log(
-        "================================="
+        "======================================"
     );
 
     console.log(
-        "CREATE PROJECT FROM TEMPLATE"
-    );
-
-    console.log(
-        "Template ID:",
-        templateId
-    );
-
-    console.log(
-        "Payload:"
+        "PROJECT FROM TEMPLATE PAYLOAD"
     );
 
     console.log(
@@ -580,7 +606,7 @@ function createProjectRequest(
     );
 
     console.log(
-        "================================="
+        "======================================"
     );
 
 
@@ -623,10 +649,19 @@ function createProjectRequest(
             onComplete: function (response) {
 
                 console.log(
-                    "PROJECT CREATED FROM TEMPLATE"
+                    "======================================"
+                );
+
+                console.log(
+                    "PROJECT CREATED SUCCESSFULLY"
                 );
 
                 console.log(response);
+
+                console.log(
+                    "======================================"
+                );
+
 
                 showSuccess(
                     "Project Created Successfully From Template"
@@ -638,43 +673,92 @@ function createProjectRequest(
             onFailure: function (error) {
 
                 console.log(
+                    "======================================"
+                );
+
+                console.log(
                     "PROJECT CREATION FAILED"
                 );
 
                 console.log(error);
 
+
                 /*
-                 * Try to display the actual
-                 * server response.
+                 * Print everything we can get
+                 * from the error object.
                  */
-                var message =
+                console.log(
+                    "Error type:",
+                    typeof error
+                );
+
+                console.log(
+                    "Error object:",
+                    error
+                );
+
+
+                try {
+
+                    console.log(
+                        "Error JSON:"
+                    );
+
+                    console.log(
+                        JSON.stringify(
+                            error,
+                            null,
+                            2
+                        )
+                    );
+
+                } catch (e) {
+
+                    console.log(
+                        "Could not stringify error"
+                    );
+
+                }
+
+
+                /*
+                 * Try to extract server response
+                 */
+                var serverMessage =
                     "PROJECT CREATION FAILED";
+
 
                 if (error) {
 
                     if (error.message) {
 
-                        message +=
+                        serverMessage +=
                             ": " +
                             error.message;
 
                     } else if (
-                        typeof error === "string"
+                        error.error
                     ) {
 
-                        message +=
+                        serverMessage +=
                             ": " +
-                            error;
+                            error.error;
+
                     }
+
                 }
 
-                showError(message);
+
+                showError(
+                    serverMessage
+                );
 
             }
 
         }
     );
 }
+
 
 
 /*
