@@ -511,46 +511,75 @@ function createProjectRequest(
     description
 ) {
 
-    /*
-     * Get the selected template object
-     */
     var select =
         document.getElementById("projectTemplate");
 
     var selectedOption =
         select.options[select.selectedIndex];
 
-    var templateObject =
+    var template =
         selectedOption.templateObject;
 
 
-    console.log("SELECTED TEMPLATE OBJECT:");
-    console.log(templateObject);
+    if (!template) {
+
+        showError(
+            "Please select a Project Template."
+        );
+
+        return;
+    }
+
+
+    console.log(
+        "SELECTED TEMPLATE OBJECT:"
+    );
+
+    console.log(template);
 
 
     /*
-     * IMPORTANT:
-     * Use the actual type returned by ENOVIA.
+     * Project Template reference
      */
-    var templateType =
-        templateObject.type;
+    var projectTemplateReference = {
+
+        id:
+            template.id,
+
+        type:
+            template.type,
+
+        identifier:
+            template.id,
+
+        source:
+            spaceUrl,
+
+        relativePath:
+            "/resources/v1/modeler/projecttemplates/" +
+            template.id,
+
+        cestamp:
+            template.cestamp
+
+    };
 
 
     console.log(
-        "Template ID:",
-        templateId
+        "PROJECT TEMPLATE REFERENCE:"
     );
 
     console.log(
-        "Template Type:",
-        templateType
+        JSON.stringify(
+            projectTemplateReference,
+            null,
+            2
+        )
     );
 
 
     /*
-     * Build payload according to:
-     *
-     * POST /projects/fromTemplate
+     * Create project from template
      */
     var payload = {
 
@@ -558,13 +587,13 @@ function createProjectRequest(
 
             {
 
-                type: "Project Space",
+                type:
+                    "Project Space",
 
                 dataelements: {
 
-                    title: projectName,
-
-                    description: description,
+                    constraintDate:
+                        "",
 
                     scheduleFrom:
                         "Project Start Date",
@@ -573,7 +602,13 @@ function createProjectRequest(
                         "As Soon As Possible",
 
                     currency:
-                        "Unassigned"
+                        "Unassigned",
+
+                    title:
+                        projectName,
+
+                    description:
+                        description
 
                 },
 
@@ -581,13 +616,7 @@ function createProjectRequest(
 
                     projectTemplate: [
 
-                        {
-
-                            id: templateId,
-
-                            type: templateType
-
-                        }
+                        projectTemplateReference
 
                     ]
 
@@ -627,18 +656,23 @@ function createProjectRequest(
 
 
     console.log(
-        "POST URL:",
-        projectUrl
+        "POST URL:"
     );
+
+    console.log(projectUrl);
 
 
     WAFData.authenticatedRequest(
+
         projectUrl,
+
         {
 
-            method: "POST",
+            method:
+                "POST",
 
-            type: "json",
+            type:
+                "json",
 
             headers: {
 
@@ -657,118 +691,61 @@ function createProjectRequest(
                 JSON.stringify(payload),
 
 
-            onComplete: function (response) {
-
-                console.log(
-                    "======================================"
-                );
-
-                console.log(
-                    "PROJECT CREATED SUCCESSFULLY"
-                );
-
-                console.log(response);
-
-                console.log(
-                    "======================================"
-                );
-
-
-                showSuccess(
-                    "Project Created Successfully From Template"
-                );
-
-            },
-
-
-            onFailure: function (error) {
-
-                console.log(
-                    "======================================"
-                );
-
-                console.log(
-                    "PROJECT CREATION FAILED"
-                );
-
-                console.log(error);
-
-
-                /*
-                 * Print everything we can get
-                 * from the error object.
-                 */
-                console.log(
-                    "Error type:",
-                    typeof error
-                );
-
-                console.log(
-                    "Error object:",
-                    error
-                );
-
-
-                try {
+            onComplete:
+                function(response) {
 
                     console.log(
-                        "Error JSON:"
+                        "======================================"
                     );
 
                     console.log(
-                        JSON.stringify(
-                            error,
-                            null,
-                            2
-                        )
+                        "PROJECT CREATED SUCCESSFULLY"
                     );
 
-                } catch (e) {
+                    console.log(response);
 
                     console.log(
-                        "Could not stringify error"
+                        "======================================"
+                    );
+
+
+                    showSuccess(
+                        "Project Created Successfully From Template"
+                    );
+
+                },
+
+
+            onFailure:
+                function(error) {
+
+                    console.log(
+                        "======================================"
+                    );
+
+                    console.log(
+                        "PROJECT CREATION FAILED"
+                    );
+
+                    console.log(error);
+
+                    console.log(
+                        "======================================"
+                    );
+
+
+                    showError(
+                        "Project creation failed. Check Network → Response."
                     );
 
                 }
-
-
-                /*
-                 * Try to extract server response
-                 */
-                var serverMessage =
-                    "PROJECT CREATION FAILED";
-
-
-                if (error) {
-
-                    if (error.message) {
-
-                        serverMessage +=
-                            ": " +
-                            error.message;
-
-                    } else if (
-                        error.error
-                    ) {
-
-                        serverMessage +=
-                            ": " +
-                            error.error;
-
-                    }
-
-                }
-
-
-                showError(
-                    serverMessage
-                );
-
-            }
 
         }
+
     );
+
 }
+
 
 
 
