@@ -1,122 +1,330 @@
+/* =========================================================
+   MAIN CONTAINER
+   ========================================================= */
+
 .dxp-container {
+
     background: #f5f6f8;
+
     padding: 10px;
-    font-family: "Segoe UI", Arial, sans-serif;
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
 }
 
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
 .dxp-header {
+
     background: #ffffff;
+
     padding: 10px 12px;
+
     font-size: 15px;
+
     font-weight: 600;
-    border-left: 4px solid #0076ff;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+
+    border-left:
+        4px solid #0076ff;
+
+    box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.08);
+
     margin-bottom: 10px;
 }
 
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
 .dxp-form {
+
     background: #ffffff;
+
     padding: 14px;
+
     border-radius: 6px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+
+    box-shadow:
+        0 1px 4px rgba(0, 0, 0, 0.08);
 }
 
+
+
+/* =========================================================
+   FIELD
+   ========================================================= */
+
 .dxp-field {
+
     margin-bottom: 12px;
 }
 
+
+
+/* =========================================================
+   LABEL
+   ========================================================= */
+
 .dxp-field label {
+
     display: block;
+
     font-size: 13px;
+
     font-weight: 600;
+
     margin-bottom: 5px;
+
     color: #444;
 }
 
-/* Text inputs */
+
+
+/* =========================================================
+   INPUT
+   ========================================================= */
+
 .dxp-field input {
+
     width: 100%;
+
     padding: 10px;
-    border: 1px solid #d6dbe1;
+
+    border:
+        1px solid #d6dbe1;
+
     border-radius: 6px;
+
     font-size: 14px;
+
     outline: none;
+
     box-sizing: border-box;
+
     transition: 0.2s;
 }
+
+
 
 .dxp-field input:focus {
+
     border-color: #0076ff;
-    box-shadow: 0 0 0 2px rgba(0,118,255,0.15);
+
+    box-shadow:
+        0 0 0 2px
+        rgba(0, 118, 255, 0.15);
 }
 
-/* Project Template dropdown */
+
+
+/* =========================================================
+   SEARCH ROW
+   ========================================================= */
+
+.search-row {
+
+    display: flex;
+
+    gap: 8px;
+
+    align-items: center;
+}
+
+
+
+.search-row input {
+
+    flex: 1;
+
+    min-width: 0;
+}
+
+
+
+.search-row button {
+
+    flex-shrink: 0;
+}
+
+
+
+/* =========================================================
+   SELECT
+   ========================================================= */
+
 .dxp-field select {
+
     width: 100%;
+
     padding: 10px;
-    border: 1px solid #d6dbe1;
+
+    border:
+        1px solid #d6dbe1;
+
     border-radius: 6px;
-    font-size: 14px;
-    outline: none;
-    box-sizing: border-box;
+
     background: #ffffff;
-    color: #333;
+
+    font-size: 14px;
+
+    outline: none;
+
+    box-sizing: border-box;
+
     cursor: pointer;
+
     transition: 0.2s;
 }
 
+
+
 .dxp-field select:focus {
+
     border-color: #0076ff;
-    box-shadow: 0 0 0 2px rgba(0,118,255,0.15);
+
+    box-shadow:
+        0 0 0 2px
+        rgba(0, 118, 255, 0.15);
 }
 
-/* Disabled dropdown */
-.dxp-field select:disabled {
-    background: #f5f6f8;
-    color: #888;
-    cursor: not-allowed;
+
+
+/* =========================================================
+   TEMPLATE INFORMATION
+   ========================================================= */
+
+.template-info {
+
+    background: #f7f9fb;
+
+    border:
+        1px solid #e1e5ea;
+
+    border-radius: 6px;
+
+    padding: 9px 10px;
+
+    margin-top: -3px;
+
+    margin-bottom: 12px;
+
+    font-size: 12px;
+
+    color: #555;
+
+    line-height: 20px;
 }
 
-/* Action area */
+
+
+.info-label {
+
+    font-weight: 600;
+
+    color: #333;
+}
+
+
+
+/* =========================================================
+   ACTIONS
+   ========================================================= */
+
 .dxp-actions {
+
     margin-top: 10px;
 }
 
-/* Create button */
+
+
+/* =========================================================
+   BUTTON
+   ========================================================= */
+
 button {
+
     background: #0076ff;
+
     color: white;
+
     border: none;
+
     padding: 10px 14px;
+
     border-radius: 6px;
+
     cursor: pointer;
+
     font-size: 14px;
+
     transition: 0.2s;
 }
 
+
+
 button:hover {
+
     background: #005ed1;
 }
 
+
+
 button:active {
-    background: #004fae;
+
+    background: #004fb5;
 }
 
+
+
 button:disabled {
+
     background: #aeb7c2;
+
     cursor: not-allowed;
 }
 
-/* Result message */
+
+
+/* =========================================================
+   RESULT
+   ========================================================= */
+
 #result {
+
     margin-top: 12px;
+
     font-weight: 600;
+
+    font-size: 13px;
 }
 
+
+
+/* =========================================================
+   SUCCESS
+   ========================================================= */
+
 .success {
+
     color: #1a7f37;
 }
 
+
+
+/* =========================================================
+   ERROR
+   ========================================================= */
+
 .error {
+
     color: #d93025;
 }
