@@ -280,6 +280,7 @@ function populateTemplates(response) {
     select.innerHTML =
         '<option value="">Select Project Template</option>';
 
+
     if (
         !response ||
         !response.data ||
@@ -287,35 +288,42 @@ function populateTemplates(response) {
     ) {
 
         select.innerHTML =
-            '<option value="">No project templates found</option>';
+            '<option value="">No templates found</option>';
 
-        showError("No project templates found.");
+        showError(
+            "No project templates found."
+        );
 
         return;
     }
 
-    console.log("ALL SEARCH RESULTS:");
+
+    console.log(
+        "ALL TEMPLATE SEARCH RESULTS:"
+    );
+
     console.log(response.data);
 
 
-    /*
-     * Keep ONLY Project Template objects
-     */
     var projectTemplates =
-        response.data.filter(function (template) {
+        response.data.filter(
+            function (template) {
 
-            console.log(
-                "Object:",
-                template.id,
-                "Type:",
-                template.type
-            );
+                console.log(
+                    "Template:",
+                    template.id,
+                    "TYPE:",
+                    template.type
+                );
 
-            return (
-                template.type === "Project Template"
-            );
 
-        });
+                return (
+                    template.type ===
+                    "Project Template"
+                );
+
+            }
+        );
 
 
     console.log(
@@ -325,33 +333,35 @@ function populateTemplates(response) {
     console.log(projectTemplates);
 
 
-    if (projectTemplates.length === 0) {
+    if (
+        projectTemplates.length === 0
+    ) {
 
         select.innerHTML =
-            '<option value="">No Project Template objects found</option>';
+            '<option value="">No Project Templates found</option>';
 
         showError(
-            "Search returned objects, but none are Project Template type."
+            "No Project Template objects found."
         );
 
         return;
     }
 
 
-    /*
-     * Add only Project Template objects
-     */
     projectTemplates.forEach(
         function (template) {
 
             var option =
                 document.createElement("option");
 
+
             option.value =
                 template.id;
 
 
-            var title = "";
+            var title =
+                template.id;
+
 
             if (
                 template.dataelements &&
@@ -369,10 +379,6 @@ function populateTemplates(response) {
                 title =
                     template.dataelements.name;
 
-            } else {
-
-                title =
-                    template.id;
             }
 
 
@@ -381,23 +387,28 @@ function populateTemplates(response) {
 
 
             /*
-             * Store complete object
+             * VERY IMPORTANT
+             *
+             * Save complete API object.
              */
             option.templateObject =
                 template;
 
 
-            select.appendChild(option);
+            select.appendChild(
+                option
+            );
 
         }
     );
 
 
     console.log(
-        "Project Templates loaded:",
+        "Number of Project Templates:",
         projectTemplates.length
     );
 }
+
 
 
 
