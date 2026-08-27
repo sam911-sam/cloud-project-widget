@@ -1,7 +1,5 @@
 (function () {
 
-    var selectedTemplate = null;
-
     function waitForWidget() {
 
         if (typeof widget === "undefined") {
@@ -25,53 +23,58 @@
 
                     '<div class="dxp-form">' +
 
-                        /* TEMPLATE */
+                        /* TEMPLATE SEARCH */
                         '<div class="dxp-field">' +
                             '<label>Project Template</label>' +
 
-                            '<div class="dxp-template-search-row">' +
+                            '<div class="dxp-search-row">' +
+                                '<input id="templateSearch" ' +
+                                    'placeholder="Enter template name..." />' +
 
-                                '<input ' +
-                                    'id="templateSearch" ' +
-                                    'placeholder="Enter template name">' +
-
-                                '<button ' +
-                                    'id="searchTemplateBtn" ' +
-                                    'type="button">' +
+                                '<button id="searchBtn" class="dxp-search-btn">' +
                                     'Search' +
                                 '</button>' +
-
                             '</div>' +
 
-                            '<div id="templateResults"></div>' +
+                        '</div>' +
 
-                            '<div id="selectedTemplate"></div>' +
+                        /* TEMPLATE RESULTS */
+                        '<div class="dxp-field">' +
+                            '<label>Template List</label>' +
 
+                            '<div id="templateList" class="dxp-template-list">' +
+                                '<div class="dxp-empty">' +
+                                    'Enter at least 2 characters and click Search' +
+                                '</div>' +
+                            '</div>' +
+
+                            '<input type="hidden" id="selectedTemplateId">' +
+                            '<input type="hidden" id="selectedTemplateType">' +
                         '</div>' +
 
                         /* PROJECT NAME */
                         '<div class="dxp-field">' +
                             '<label>Project Name</label>' +
-                            '<input ' +
-                                'id="projectName" ' +
+
+                            '<input id="projectName" ' +
                                 'placeholder="Enter project name">' +
                         '</div>' +
 
                         /* DESCRIPTION */
                         '<div class="dxp-field">' +
                             '<label>Description</label>' +
-                            '<input ' +
-                                'id="projectDescription" ' +
+
+                            '<input id="projectDescription" ' +
                                 'placeholder="Enter description">' +
                         '</div>' +
 
-                        /* CREATE BUTTON */
+                        /* CREATE */
                         '<div class="dxp-actions">' +
-                            '<button ' +
-                                'id="createBtn" ' +
-                                'type="button">' +
+
+                            '<button id="createBtn">' +
                                 'Create Project' +
                             '</button>' +
+
                         '</div>' +
 
                         '<div id="result"></div>' +
@@ -80,32 +83,13 @@
 
                 '</div>';
 
+            document.getElementById("searchBtn").onclick =
+                searchTemplates;
 
-            document.getElementById(
-                "searchTemplateBtn"
-            ).onclick = searchTemplates;
+            document.getElementById("createBtn").onclick =
+                createProjectFromTemplate;
 
-
-            document.getElementById(
-                "createBtn"
-            ).onclick = createProjectFromTemplate;
-
-
-            /*
-             * ENTER KEY ALSO SEARCHES
-             */
-
-            document.getElementById(
-                "templateSearch"
-            ).onkeydown = function (event) {
-
-                if (event.key === "Enter") {
-
-                    event.preventDefault();
-
-                    searchTemplates();
-                }
-            };
+            console.log("UI initialized");
 
         });
     }
@@ -115,57 +99,383 @@
 })();
 
 
-/*
- * ============================================================
- * SEARCH TEMPLATES
- * ============================================================
- */
+/* ============================================================
+   SEARCH PROJECT TEMPLATES
+   ============================================================ */
 
 function searchTemplates() {
 
-    var searchText =
-        document.getElementById(
-            "templateSearch"
-        ).value.trim();
+    var searchInput =
+        document.getElementById("templateSearch");
 
+    var searchStr =
+        searchInput.value.trim();
 
-    var results =
-        document.getElementById(
-            "templateResults"
-        );
+    console.log("Searching Template:", searchStr);
 
-    var selected =
-        document.getElementById(
-            "selectedTemplate"
-        );
+    if (searchStr.length < 2) {
 
-
-    selected.innerHTML = "";
-
-
-    if (searchText.length < 2) {
-
-        results.innerHTML =
-            '<div class="error">' +
-            'Enter at least 2 characters' +
+        document.getElementById("templateList").innerHTML =
+            '<div class="dxp-error">' +
+                'Please enter at least 2 characters.' +
             '</div>';
 
         return;
     }
 
+    document.getElementById("templateList").innerHTML =
+        '<div class="dxp-loading">Searching...</div>';
 
-    results.innerHTML =
-        '<div class="dxp-loading">' +
-        'Searching templates...' +
-        '</div>';
+    require(
+        [
+            "DS/WAFData/WAFData",
+            "DS/i3DXCompassServices/i3DXCompassServices"
+        ],
+
+        function (
+            WAFData,
+            CompassServices
+        ) {
+
+            console.log("Modules Loaded");
+
+            CompassServices.getPlatformServices({
+
+                platformId:
+                    widget.getValue("x3dPlatformId"),
+
+                onComplete: function (services) {
+
+                    console.log("Services Received");
+                    console.log(services);
+
+                    var spaceUrl =
+                        services["3DSpace"];
+
+                    console.log(
+                        "3DSpace URL:",
+                        spaceUrl
+                    );
+
+                    /*
+                     * IMPORTANT
+                     *
+                     * Project creation uses:
+                     *
+                     * /resources/v1/modeler/projects
+                     *
+                     * Project template API is under
+                     * the projects resource.
+                     */
+
+                    var templateUrl =
+                        spaceUrl +
+                        "/resources/v1/modeler/projects/projecttemplates/search" +
+                        "?searchStr=" +
+                        encodeURIComponent(searchStr) +
+                        "&$top=50";
+
+                    console.log(
+                        "Template Search URL:",
+                        templateUrl
+                    );
+
+                    /*
+                     * Security Context
+                     *
+                     * Use the widget's current security context
+                     * if it is available.
+                     */
+
+                    var securityContext =
+                        widget.getValue("x3dSecurityContext");
+
+                    console.log(
+                        "Security Context:",
+                        securityContext
+                    );
+
+                    WAFData.authenticatedRequest(
+                        templateUrl,
+                        {
+
+                            method: "GET",
+
+                            type: "json",
+
+                            headers: {
+
+                                "Accept":
+                                    "application/json",
+
+                                "SecurityContext":
+                                    securityContext || ""
+
+                            },
+
+                            onComplete:
+                                function (response) {
+
+                                    console.log(
+                                        "TEMPLATE SEARCH SUCCESS"
+                                    );
+
+                                    console.log(
+                                        response
+                                    );
+
+                                    displayTemplates(
+                                        response
+                                    );
+                                },
+
+                            onFailure:
+                                function (error) {
+
+                                    console.log(
+                                        "TEMPLATE SEARCH FAILED"
+                                    );
+
+                                    console.log(error);
+
+                                    document.getElementById(
+                                        "templateList"
+                                    ).innerHTML =
+                                        '<div class="dxp-error">' +
+                                            'Template search failed.' +
+                                        '</div>';
+                                }
+                        }
+                    );
+
+                },
+
+                onFailure: function (error) {
+
+                    console.log(
+                        "SERVICE DISCOVERY FAILED"
+                    );
+
+                    console.log(error);
+
+                    document.getElementById(
+                        "templateList"
+                    ).innerHTML =
+                        '<div class="dxp-error">' +
+                            'Unable to get 3DSpace service.' +
+                        '</div>';
+                }
+            });
+
+        }
+    );
+}
 
 
-    selectedTemplate = null;
+/* ============================================================
+   DISPLAY TEMPLATE RESULTS
+   ============================================================ */
+
+function displayTemplates(response) {
+
+    var list =
+        document.getElementById("templateList");
+
+    list.innerHTML = "";
+
+    if (
+        !response ||
+        !response.data ||
+        response.data.length === 0
+    ) {
+
+        list.innerHTML =
+            '<div class="dxp-empty">' +
+                'No project templates found.' +
+            '</div>';
+
+        return;
+    }
+
+    console.log(
+        "Templates Found:",
+        response.data.length
+    );
+
+    response.data.forEach(function (template) {
+
+        var data =
+            template.dataelements || {};
+
+        var title =
+            data.title ||
+            data.name ||
+            "Unnamed Template";
+
+        var description =
+            data.description || "";
+
+        var item =
+            document.createElement("div");
+
+        item.className =
+            "dxp-template-item";
+
+        item.innerHTML =
+            '<div class="dxp-template-title">' +
+                escapeHtml(title) +
+            '</div>' +
+
+            '<div class="dxp-template-info">' +
+                escapeHtml(description) +
+            '</div>';
+
+        item.onclick = function () {
+
+            selectTemplate(
+                template,
+                item
+            );
+
+        };
+
+        list.appendChild(item);
+
+    });
+}
+
+
+/* ============================================================
+   SELECT TEMPLATE
+   ============================================================ */
+
+function selectTemplate(
+    template,
+    element
+) {
+
+    console.log(
+        "Selected Template:",
+        template
+    );
+
+    /*
+     * Remove previous selection
+     */
+
+    var items =
+        document.querySelectorAll(
+            ".dxp-template-item"
+        );
+
+    for (var i = 0; i < items.length; i++) {
+
+        items[i].classList.remove(
+            "selected"
+        );
+    }
+
+    element.classList.add("selected");
+
+    /*
+     * Store template information
+     */
+
+    document.getElementById(
+        "selectedTemplateId"
+    ).value = template.id || "";
+
+    document.getElementById(
+        "selectedTemplateType"
+    ).value = template.type || "";
+
+    console.log(
+        "Selected Template ID:",
+        template.id
+    );
+
+    /*
+     * Show selected template
+     */
+
+    var title =
+        template.dataelements &&
+        (
+            template.dataelements.title ||
+            template.dataelements.name
+        );
+
+    document.getElementById(
+        "templateSearch"
+    ).value = title || "";
+
+}
+
+
+/* ============================================================
+   CREATE PROJECT FROM TEMPLATE
+   ============================================================ */
+
+function createProjectFromTemplate() {
+
+    console.log(
+        "Create Project From Template Clicked"
+    );
+
+    var templateId =
+        document.getElementById(
+            "selectedTemplateId"
+        ).value;
+
+    var templateType =
+        document.getElementById(
+            "selectedTemplateType"
+        ).value;
+
+    var projectName =
+        document.getElementById(
+            "projectName"
+        ).value.trim();
+
+    var description =
+        document.getElementById(
+            "projectDescription"
+        ).value.trim();
+
+
+    /*
+     * VALIDATION
+     */
+
+    if (!templateId) {
+
+        showResult(
+            "Please select a project template.",
+            "error"
+        );
+
+        return;
+    }
+
+    if (!projectName) {
+
+        showResult(
+            "Please enter a project name.",
+            "error"
+        );
+
+        return;
+    }
 
 
     console.log(
-        "Searching Template:",
-        searchText
+        "Template ID:",
+        templateId
+    );
+
+    console.log(
+        "Project Name:",
+        projectName
     );
 
 
@@ -184,29 +494,16 @@ function searchTemplates() {
                 "Modules Loaded"
             );
 
-
             CompassServices.getPlatformServices({
 
                 platformId:
-                    widget.getValue(
-                        "x3dPlatformId"
-                    ),
+                    widget.getValue("x3dPlatformId"),
 
                 onComplete:
                     function (services) {
 
-                        console.log(
-                            "Services Received"
-                        );
-
-                        console.log(
-                            services
-                        );
-
-
                         var spaceUrl =
                             services["3DSpace"];
-
 
                         console.log(
                             "3DSpace URL:",
@@ -215,7 +512,7 @@ function searchTemplates() {
 
 
                         /*
-                         * FIRST GET CSRF
+                         * GET CSRF TOKEN
                          */
 
                         var csrfUrl =
@@ -231,7 +528,6 @@ function searchTemplates() {
 
                                 type: "json",
 
-
                                 onComplete:
                                     function (
                                         csrfResponse
@@ -241,533 +537,25 @@ function searchTemplates() {
                                             "CSRF SUCCESS"
                                         );
 
-
                                         var csrfToken =
                                             csrfResponse
                                                 .csrf
                                                 .value;
-
-
-                                        searchTemplateRequest(
-                                            WAFData,
-                                            spaceUrl,
-                                            csrfToken,
-                                            searchText
-                                        );
-
-                                    },
-
-
-                                onFailure:
-                                    function (
-                                        error
-                                    ) {
-
-                                        console.log(
-                                            "CSRF FAILED"
-                                        );
-
-                                        console.log(
-                                            error
-                                        );
-
-
-                                        results.innerHTML =
-                                            '<div class="error">' +
-                                            'CSRF FAILED' +
-                                            '</div>';
-                                    }
-                            }
-                        );
-
-                    },
-
-
-                onFailure:
-                    function (error) {
-
-                        console.log(
-                            "SERVICE DISCOVERY FAILED"
-                        );
-
-                        console.log(
-                            error
-                        );
-
-
-                        results.innerHTML =
-                            '<div class="error">' +
-                            'SERVICE DISCOVERY FAILED' +
-                            '</div>';
-                    }
-            });
-
-        }
-    );
-}
-
-
-/*
- * ============================================================
- * TEMPLATE SEARCH REQUEST
- * ============================================================
- */
-
-function searchTemplateRequest(
-    WAFData,
-    spaceUrl,
-    csrfToken,
-    searchText
-) {
-
-    var results =
-        document.getElementById(
-            "templateResults"
-        );
-
-
-    var templateUrl =
-        spaceUrl +
-        "/projecttemplates/search?searchStr=" +
-        encodeURIComponent(searchText) +
-        "&$top=50";
-
-
-    console.log(
-        "Template Search URL:",
-        templateUrl
-    );
-
-
-    WAFData.authenticatedRequest(
-        templateUrl,
-
-        {
-
-            method: "GET",
-
-            type: "json",
-
-
-            headers: {
-
-                "Accept":
-                    "application/json",
-
-                "ENO_CSRF_TOKEN":
-                    csrfToken
-            },
-
-
-            onComplete:
-                function (response) {
-
-                    console.log(
-                        "TEMPLATE SEARCH SUCCESS"
-                    );
-
-                    console.log(
-                        response
-                    );
-
-
-                    displayTemplateResults(
-                        response
-                    );
-                },
-
-
-            onFailure:
-                function (error) {
-
-                    console.log(
-                        "TEMPLATE SEARCH FAILED"
-                    );
-
-                    console.log(
-                        error
-                    );
-
-
-                    results.innerHTML =
-                        '<div class="error">' +
-                        'TEMPLATE SEARCH FAILED' +
-                        '</div>';
-                }
-        }
-    );
-}
-
-
-/*
- * ============================================================
- * DISPLAY TEMPLATE RESULTS
- * ============================================================
- */
-
-function displayTemplateResults(
-    response
-) {
-
-    var results =
-        document.getElementById(
-            "templateResults"
-        );
-
-
-    results.innerHTML = "";
-
-
-    if (
-        !response ||
-        !response.data ||
-        response.data.length === 0
-    ) {
-
-        results.innerHTML =
-            '<div class="dxp-no-results">' +
-            'No templates found' +
-            '</div>';
-
-        return;
-    }
-
-
-    console.log(
-        "Templates Found:",
-        response.data.length
-    );
-
-
-    var list =
-        document.createElement(
-            "div"
-        );
-
-    list.className =
-        "dxp-template-list";
-
-
-    response.data.forEach(
-        function (template) {
-
-            var dataelements =
-                template.dataelements || {};
-
-
-            var title =
-                dataelements.title ||
-                dataelements.name ||
-                "Unnamed Template";
-
-
-            var revision =
-                dataelements.revision ||
-                "";
-
-
-            var description =
-                dataelements.description ||
-                "";
-
-
-            var item =
-                document.createElement(
-                    "div"
-                );
-
-
-            item.className =
-                "dxp-template-item";
-
-
-            item.innerHTML =
-
-                '<div class="dxp-template-title">' +
-                    escapeHtml(title) +
-                '</div>' +
-
-                (
-                    revision
-                    ?
-                    '<div class="dxp-template-revision">' +
-                        'Revision: ' +
-                        escapeHtml(revision) +
-                    '</div>'
-                    :
-                    ''
-                ) +
-
-                (
-                    description
-                    ?
-                    '<div class="dxp-template-description">' +
-                        escapeHtml(description) +
-                    '</div>'
-                    :
-                    ''
-                );
-
-
-            item.onclick =
-                function () {
-
-                    selectTemplate(
-                        template
-                    );
-
-                };
-
-
-            list.appendChild(
-                item
-            );
-
-        }
-    );
-
-
-    results.appendChild(
-        list
-    );
-}
-
-
-/*
- * ============================================================
- * SELECT TEMPLATE
- * ============================================================
- */
-
-function selectTemplate(
-    template
-) {
-
-    selectedTemplate =
-        template;
-
-
-    console.log(
-        "Selected Template:"
-    );
-
-    console.log(
-        template
-    );
-
-
-    var dataelements =
-        template.dataelements || {};
-
-
-    var title =
-        dataelements.title ||
-        dataelements.name ||
-        "Unnamed Template";
-
-
-    document.getElementById(
-        "templateResults"
-    ).innerHTML = "";
-
-
-    document.getElementById(
-        "templateSearch"
-    ).value = title;
-
-
-    document.getElementById(
-        "selectedTemplate"
-    ).innerHTML =
-
-        '<div class="dxp-selected-template">' +
-
-            '<span class="dxp-selected-label">' +
-                'Selected Template: ' +
-            '</span>' +
-
-            escapeHtml(title) +
-
-        '</div>';
-
-
-    console.log(
-        "Template ID:",
-        template.id
-    );
-
-    console.log(
-        "Template Type:",
-        template.type
-    );
-
-    console.log(
-        "Template Cestamp:",
-        template.cestamp
-    );
-
-}
-
-
-/*
- * ============================================================
- * CREATE PROJECT FROM TEMPLATE
- * ============================================================
- */
-
-function createProjectFromTemplate() {
-
-    console.log(
-        "Create Project From Template Clicked"
-    );
-
-
-    var result =
-        document.getElementById(
-            "result"
-        );
-
-
-    var projectName =
-        document.getElementById(
-            "projectName"
-        ).value.trim();
-
-
-    var description =
-        document.getElementById(
-            "projectDescription"
-        ).value.trim();
-
-
-    /*
-     * VALIDATION
-     */
-
-    if (!selectedTemplate) {
-
-        result.innerHTML =
-            '<span class="error">' +
-            'Please search and select a template' +
-            '</span>';
-
-        return;
-    }
-
-
-    if (!projectName) {
-
-        result.innerHTML =
-            '<span class="error">' +
-            'Please enter project name' +
-            '</span>';
-
-        return;
-    }
-
-
-    result.innerHTML =
-        '<span>' +
-        'Creating project...' +
-        '</span>';
-
-
-    console.log(
-        "Project Name:",
-        projectName
-    );
-
-    console.log(
-        "Description:",
-        description
-    );
-
-    console.log(
-        "Selected Template:",
-        selectedTemplate
-    );
-
-
-    require(
-        [
-            "DS/WAFData/WAFData",
-            "DS/i3DXCompassServices/i3DXCompassServices"
-        ],
-
-        function (
-            WAFData,
-            CompassServices
-        ) {
-
-
-            CompassServices.getPlatformServices({
-
-                platformId:
-                    widget.getValue(
-                        "x3dPlatformId"
-                    ),
-
-
-                onComplete:
-                    function (services) {
-
-                        var spaceUrl =
-                            services["3DSpace"];
-
-
-                        console.log(
-                            "3DSpace URL:",
-                            spaceUrl
-                        );
-
-
-                        var csrfUrl =
-                            spaceUrl +
-                            "/resources/v1/application/CSRF";
-
-
-                        WAFData.authenticatedRequest(
-                            csrfUrl,
-
-                            {
-
-                                method: "GET",
-
-                                type: "json",
-
-
-                                onComplete:
-                                    function (
-                                        csrfResponse
-                                    ) {
-
-                                        console.log(
-                                            "CSRF SUCCESS"
-                                        );
-
-
-                                        var csrfToken =
-                                            csrfResponse
-                                                .csrf
-                                                .value;
-
 
                                         createProjectRequest(
                                             WAFData,
                                             spaceUrl,
                                             csrfToken,
-                                            selectedTemplate,
+                                            templateId,
+                                            templateType,
                                             projectName,
                                             description
                                         );
 
                                     },
 
-
                                 onFailure:
-                                    function (
-                                        error
-                                    ) {
+                                    function (error) {
 
                                         console.log(
                                             "CSRF FAILED"
@@ -777,17 +565,15 @@ function createProjectFromTemplate() {
                                             error
                                         );
 
-
-                                        result.innerHTML =
-                                            '<span class="error">' +
-                                            'CSRF FAILED' +
-                                            '</span>';
+                                        showResult(
+                                            "CSRF FAILED",
+                                            "error"
+                                        );
                                     }
                             }
                         );
 
                     },
-
 
                 onFailure:
                     function (error) {
@@ -796,16 +582,10 @@ function createProjectFromTemplate() {
                             "SERVICE DISCOVERY FAILED"
                         );
 
-                        console.log(
-                            error
-                        );
+                        console.log(error);
 
-
-                        result.innerHTML =
-                            '<span class="error">' +
-                            'SERVICE DISCOVERY FAILED' +
-                            '</span>';
                     }
+
             });
 
         }
@@ -813,48 +593,19 @@ function createProjectFromTemplate() {
 }
 
 
-/*
- * ============================================================
- * CREATE PROJECT REQUEST
- * ============================================================
- */
+/* ============================================================
+   CREATE PROJECT REQUEST
+   ============================================================ */
 
 function createProjectRequest(
     WAFData,
     spaceUrl,
     csrfToken,
-    template,
+    templateId,
+    templateType,
     projectName,
     description
 ) {
-
-    var result =
-        document.getElementById(
-            "result"
-        );
-
-
-    /*
-     * API TEMPLATE INFORMATION
-     */
-
-    var templateId =
-        template.id;
-
-
-    var templateType =
-        template.type ||
-        "Project Template";
-
-
-    var templateCestamp =
-        template.cestamp ||
-        "";
-
-
-    /*
-     * REQUEST BODY
-     */
 
     var payload = {
 
@@ -862,14 +613,19 @@ function createProjectRequest(
 
             {
 
-                type:
-                    "Project Space",
+                /*
+                 * Project Space
+                 */
 
+                type: "Project Space",
 
                 dataelements: {
 
-                    constraintDate:
-                        "",
+                    title:
+                        projectName,
+
+                    description:
+                        description,
 
                     scheduleFrom:
                         "Project Start Date",
@@ -878,15 +634,9 @@ function createProjectRequest(
                         "As Soon As Possible",
 
                     currency:
-                        "Unassigned",
+                        "Unassigned"
 
-                    title:
-                        projectName,
-
-                    description:
-                        description
                 },
-
 
                 relateddata: {
 
@@ -907,11 +657,9 @@ function createProjectRequest(
                                 spaceUrl,
 
                             relativePath:
-                                "/resources/v1/modeler/samples/" +
-                                templateId,
+                                "/resources/v1/modeler/projects/" +
+                                templateId
 
-                            cestamp:
-                                templateCestamp
                         }
 
                     ]
@@ -938,30 +686,18 @@ function createProjectRequest(
     );
 
 
-    /*
-     * PROJECT API
-     */
-
     var projectUrl =
         spaceUrl +
         "/resources/v1/modeler/projects";
 
 
-    console.log(
-        "Project URL:",
-        projectUrl
-    );
-
-
     WAFData.authenticatedRequest(
         projectUrl,
-
         {
 
             method: "POST",
 
             type: "json",
-
 
             headers: {
 
@@ -973,14 +709,11 @@ function createProjectRequest(
 
                 "ENO_CSRF_TOKEN":
                     csrfToken
+
             },
 
-
             data:
-                JSON.stringify(
-                    payload
-                ),
-
+                JSON.stringify(payload),
 
             onComplete:
                 function (response) {
@@ -993,13 +726,12 @@ function createProjectRequest(
                         response
                     );
 
+                    showResult(
+                        "Project Created Successfully",
+                        "success"
+                    );
 
-                    result.innerHTML =
-                        '<span class="success">' +
-                        'Project Created Successfully' +
-                        '</span>';
                 },
-
 
             onFailure:
                 function (error) {
@@ -1012,11 +744,11 @@ function createProjectRequest(
                         error
                     );
 
+                    showResult(
+                        "PROJECT CREATION FAILED",
+                        "error"
+                    );
 
-                    result.innerHTML =
-                        '<span class="error">' +
-                        'PROJECT CREATION FAILED' +
-                        '</span>';
                 }
 
         }
@@ -1024,44 +756,42 @@ function createProjectRequest(
 }
 
 
-/*
- * ============================================================
- * ESCAPE HTML
- * ============================================================
- */
+/* ============================================================
+   RESULT MESSAGE
+   ============================================================ */
 
-function escapeHtml(
-    value
+function showResult(
+    message,
+    type
 ) {
 
-    if (
-        value === null ||
-        value === undefined
-    ) {
+    var result =
+        document.getElementById(
+            "result"
+        );
 
+    result.className =
+        type;
+
+    result.innerHTML =
+        message;
+}
+
+
+/* ============================================================
+   HTML ESCAPE
+   ============================================================ */
+
+function escapeHtml(value) {
+
+    if (!value) {
         return "";
     }
 
-
     return String(value)
-        .replace(
-            /&/g,
-            "&amp;"
-        )
-        .replace(
-            /</g,
-            "&lt;"
-        )
-        .replace(
-            />/g,
-            "&gt;"
-        )
-        .replace(
-            /"/g,
-            "&quot;"
-        )
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
