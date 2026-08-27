@@ -275,9 +275,7 @@ function searchProjectTemplates(
 function populateTemplates(response) {
 
     var select =
-        document.getElementById(
-            "projectTemplate"
-        );
+        document.getElementById("projectTemplate");
 
     select.innerHTML =
         '<option value="">Select Project Template</option>';
@@ -289,32 +287,70 @@ function populateTemplates(response) {
     ) {
 
         select.innerHTML =
-            '<option value="">No templates found</option>';
+            '<option value="">No project templates found</option>';
+
+        showError("No project templates found.");
+
+        return;
+    }
+
+    console.log("ALL SEARCH RESULTS:");
+    console.log(response.data);
+
+
+    /*
+     * Keep ONLY Project Template objects
+     */
+    var projectTemplates =
+        response.data.filter(function (template) {
+
+            console.log(
+                "Object:",
+                template.id,
+                "Type:",
+                template.type
+            );
+
+            return (
+                template.type === "Project Template"
+            );
+
+        });
+
+
+    console.log(
+        "FILTERED PROJECT TEMPLATES:"
+    );
+
+    console.log(projectTemplates);
+
+
+    if (projectTemplates.length === 0) {
+
+        select.innerHTML =
+            '<option value="">No Project Template objects found</option>';
 
         showError(
-            "No project templates found."
+            "Search returned objects, but none are Project Template type."
         );
 
         return;
     }
 
-    response.data.forEach(
+
+    /*
+     * Add only Project Template objects
+     */
+    projectTemplates.forEach(
         function (template) {
 
             var option =
                 document.createElement("option");
 
-            /*
-             * Important:
-             * We use the actual template ID returned
-             * by the search API.
-             */
             option.value =
                 template.id;
 
-            /*
-             * Prefer title, otherwise name.
-             */
+
             var title = "";
 
             if (
@@ -339,26 +375,30 @@ function populateTemplates(response) {
                     template.id;
             }
 
+
             option.text =
                 title;
 
+
             /*
-             * Keep the entire template object
-             * available on the option.
+             * Store complete object
              */
             option.templateObject =
                 template;
+
 
             select.appendChild(option);
 
         }
     );
 
+
     console.log(
-        "Templates loaded:",
-        response.data.length
+        "Project Templates loaded:",
+        projectTemplates.length
     );
 }
+
 
 
 /*
