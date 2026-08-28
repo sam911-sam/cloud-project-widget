@@ -263,7 +263,7 @@ function populateTemplates(response) {
     /*
      * Only show:
      * Type  = Project Template
-     * State = Release
+     * State = Released
      */
     var projectTemplates = response.data.filter(function (template) {
         var type = template.type;
@@ -286,10 +286,10 @@ function populateTemplates(response) {
             title
         );
 
-        return type === "Project Template" && state === "Release";
+        return type === "Project Template" && state === "Released";
     });
 
-    console.log("RELEASE PROJECT TEMPLATES:");
+    console.log("RELEASED PROJECT TEMPLATES:");
     console.log(projectTemplates);
 
     if (projectTemplates.length === 0) {
