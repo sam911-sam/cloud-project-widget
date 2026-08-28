@@ -56,28 +56,35 @@
                         // PROJECT NAME
                         '<div class="dxp-field">' +
                             '<label>Project Name</label>' +
+
                             '<input ' +
                                 'id="projectName" ' +
                                 'placeholder="Enter project name">' +
+
                         '</div>' +
 
                         // DESCRIPTION
                         '<div class="dxp-field">' +
                             '<label>Description</label>' +
+
                             '<input ' +
                                 'id="projectDescription" ' +
                                 'placeholder="Enter description">' +
+
                         '</div>' +
 
                         // CREATE BUTTON
                         '<div class="dxp-actions">' +
+
                             '<button ' +
                                 'id="createBtn" ' +
                                 'class="dxp-create-button">' +
                                 'Create Project' +
                             '</button>' +
+
                         '</div>' +
 
+                        // RESULT
                         '<div id="result"></div>' +
 
                     '</div>' +
@@ -85,13 +92,36 @@
                 '</div>';
 
 
-            // BUTTON EVENTS
+            /*
+             * BUTTON EVENTS
+             */
 
-            document.getElementById("searchTemplateBtn").onclick =
+            document.getElementById(
+                "searchTemplateBtn"
+            ).onclick =
                 searchTemplateButtonClicked;
 
-            document.getElementById("createBtn").onclick =
+
+            document.getElementById(
+                "createBtn"
+            ).onclick =
                 createProjectFromTemplate;
+
+
+            /*
+             * TEMPLATE SELECTION EVENT
+             *
+             * This is the important addition.
+             * When the user selects a template,
+             * the "Searching templates..." message
+             * is replaced.
+             */
+
+            document.getElementById(
+                "projectTemplate"
+            ).onchange =
+                templateSelectionChanged;
+
 
             initialize();
 
@@ -103,12 +133,14 @@
 })();
 
 
+
 /*
  * GLOBAL VARIABLES
  */
 
 var projectSpaceUrl = null;
 var csrfToken = null;
+
 
 
 /*
@@ -171,6 +203,7 @@ function initialize() {
 }
 
 
+
 /*
  * GET CSRF TOKEN
  */
@@ -185,6 +218,7 @@ function getCSRFToken(
     var csrfUrl =
         spaceUrl +
         "/resources/v1/application/CSRF";
+
 
     WAFData.authenticatedRequest(
         csrfUrl,
@@ -234,6 +268,7 @@ function getCSRFToken(
 }
 
 
+
 /*
  * SEARCH BUTTON CLICK
  */
@@ -244,6 +279,7 @@ function searchTemplateButtonClicked() {
         document.getElementById(
             "templateSearch"
         ).value.trim();
+
 
     console.log(
         "Searching Template:",
@@ -275,6 +311,38 @@ function searchTemplateButtonClicked() {
     }
 
 
+    /*
+     * Reset template list before new search.
+     */
+
+    var select =
+        document.getElementById(
+            "projectTemplate"
+        );
+
+
+    select.innerHTML =
+        '<option value="">Searching templates...</option>';
+
+
+    /*
+     * Disable search button while request
+     * is running.
+     */
+
+    var searchButton =
+        document.getElementById(
+            "searchTemplateBtn"
+        );
+
+
+    searchButton.disabled = true;
+
+
+    searchButton.innerHTML =
+        "Searching...";
+
+
     require(
         [
             "DS/WAFData/WAFData"
@@ -291,6 +359,7 @@ function searchTemplateButtonClicked() {
         }
     );
 }
+
 
 
 /*
@@ -350,6 +419,14 @@ function searchProjectTemplates(
 
                 console.log(response);
 
+
+                /*
+                 * Re-enable search button.
+                 */
+
+                resetSearchButton();
+
+
                 populateTemplates(
                     response
                 );
@@ -363,6 +440,28 @@ function searchProjectTemplates(
 
                 console.log(error);
 
+
+                /*
+                 * Re-enable search button.
+                 */
+
+                resetSearchButton();
+
+
+                /*
+                 * Reset select list.
+                 */
+
+                var select =
+                    document.getElementById(
+                        "projectTemplate"
+                    );
+
+
+                select.innerHTML =
+                    '<option value="">Search failed</option>';
+
+
                 showError(
                     "Template search failed."
                 );
@@ -372,6 +471,33 @@ function searchProjectTemplates(
 }
 
 
+
+/*
+ * RESET SEARCH BUTTON
+ */
+
+function resetSearchButton() {
+
+    var searchButton =
+        document.getElementById(
+            "searchTemplateBtn"
+        );
+
+
+    if (!searchButton) {
+        return;
+    }
+
+
+    searchButton.disabled = false;
+
+
+    searchButton.innerHTML =
+        "Search";
+}
+
+
+
 /*
  * POPULATE TEMPLATE LIST
  */
@@ -379,10 +505,14 @@ function searchProjectTemplates(
 function populateTemplates(response) {
 
     var select =
-        document.getElementById("projectTemplate");
+        document.getElementById(
+            "projectTemplate"
+        );
+
 
     select.innerHTML =
         '<option value="">Select Project Template</option>';
+
 
     if (
         !response ||
@@ -393,17 +523,34 @@ function populateTemplates(response) {
         select.innerHTML =
             '<option value="">No templates found</option>';
 
-        showError("No project templates found.");
+
+        showError(
+            "No project templates found."
+        );
+
 
         return;
     }
 
-    console.log("ALL SEARCH RESULTS:");
- console.log(
-    "SELECTED/ALL TEMPLATE DATA:",
-    JSON.stringify(response.data, null, 2)
-);
 
+    console.log(
+        "ALL SEARCH RESULTS:"
+    );
+
+
+    console.log(
+        "SELECTED/ALL TEMPLATE DATA:",
+        JSON.stringify(
+            response.data,
+            null,
+            2
+        )
+    );
+
+
+    /*
+     * Filter only Project Template objects.
+     */
 
     var projectTemplates =
         response.data.filter(function (template) {
@@ -418,34 +565,53 @@ function populateTemplates(response) {
                 template.dataelements.title
             );
 
-            return template.type === "Project Template";
+
+            return (
+                template.type ===
+                "Project Template"
+            );
         });
+
 
     console.log(
         "FILTERED PROJECT TEMPLATES:",
         projectTemplates
     );
 
+
     if (projectTemplates.length === 0) {
 
         select.innerHTML =
             '<option value="">No Project Template objects found</option>';
 
+
         showError(
             "Search returned objects, but none are Project Template type."
         );
 
+
         return;
     }
+
+
+    /*
+     * Add templates to dropdown.
+     */
 
     projectTemplates.forEach(function (template) {
 
         var option =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
-        option.value = template.id;
+
+        option.value =
+            template.id;
+
 
         var title = "";
+
 
         if (
             template.dataelements &&
@@ -469,19 +635,118 @@ function populateTemplates(response) {
                 template.id;
         }
 
-        option.text = title;
+
+        option.text =
+            title;
+
 
         /*
-         * Store the complete API object.
+         * Store complete API object.
          */
-        option.templateObject = template;
 
-        select.appendChild(option);
+        option.templateObject =
+            template;
+
+
+        select.appendChild(
+            option
+        );
+
     });
+
 
     console.log(
         "Project Templates loaded:",
         projectTemplates.length
+    );
+
+
+    /*
+     * IMPORTANT:
+     *
+     * Search is now complete.
+     * Replace "Searching templates..."
+     * with a useful message.
+     */
+
+    showInfo(
+        projectTemplates.length +
+        " project template" +
+        (
+            projectTemplates.length === 1
+                ? ""
+                : "s"
+        ) +
+        " found. Please select a template."
+    );
+}
+
+
+
+/*
+ * TEMPLATE SELECTION CHANGED
+ *
+ * This fixes the issue you described.
+ */
+
+function templateSelectionChanged() {
+
+    var select =
+        document.getElementById(
+            "projectTemplate"
+        );
+
+
+    var selectedIndex =
+        select.selectedIndex;
+
+
+    if (
+        selectedIndex < 0 ||
+        !select.value
+    ) {
+
+        return;
+    }
+
+
+    var selectedOption =
+        select.options[selectedIndex];
+
+
+    var template =
+        selectedOption.templateObject;
+
+
+    if (!template) {
+
+        return;
+    }
+
+
+    var templateTitle =
+        (
+            template.dataelements &&
+            template.dataelements.title
+        )
+            ? template.dataelements.title
+            : template.id;
+
+
+    console.log(
+        "Template selected:",
+        templateTitle
+    );
+
+
+    /*
+     * Replace the previous
+     * "Searching templates..." message.
+     */
+
+    showInfo(
+        "Template selected: " +
+        templateTitle
     );
 }
 
@@ -560,6 +825,33 @@ function createProjectFromTemplate() {
     }
 
 
+    /*
+     * Disable create button while
+     * project is being created.
+     */
+
+    var createButton =
+        document.getElementById(
+            "createBtn"
+        );
+
+
+    createButton.disabled = true;
+
+
+    createButton.innerHTML =
+        "Creating...";
+
+
+    /*
+     * Show progress.
+     */
+
+    showInfo(
+        "Creating project..."
+    );
+
+
     require(
         [
             "DS/WAFData/WAFData"
@@ -581,6 +873,7 @@ function createProjectFromTemplate() {
 }
 
 
+
 /*
  * CREATE PROJECT REQUEST
  */
@@ -595,53 +888,85 @@ function createProjectRequest(
 ) {
 
     var select =
-        document.getElementById("projectTemplate");
+        document.getElementById(
+            "projectTemplate"
+        );
+
 
     var selectedOption =
-        select.options[select.selectedIndex];
+        select.options[
+            select.selectedIndex
+        ];
+
 
     var template =
         selectedOption.templateObject;
 
-    console.log("=================================");
-    console.log("SELECTED TEMPLATE OBJECT");
+
+    console.log(
+        "================================="
+    );
+
+
+    console.log(
+        "SELECTED TEMPLATE OBJECT"
+    );
+
+
     console.log(template);
-    console.log("=================================");
+
+
+    console.log(
+        "================================="
+    );
+
 
     if (!template) {
+
+        resetCreateButton();
+
 
         showError(
             "Selected template information is not available."
         );
 
+
         return;
     }
+
 
     /*
      * Build the project template reference
      * according to the API schema.
      */
+
     var templateReference = {
 
-        id: template.id,
+        id:
+            template.id,
 
-        type: template.type,
+        type:
+            template.type,
 
-        identifier: template.id,
+        identifier:
+            template.id,
 
-        source: spaceUrl,
+        source:
+            spaceUrl,
 
         relativePath:
             "/resources/v1/modeler/projecttemplates/" +
             template.id,
 
-        cestamp: template.cestamp
+        cestamp:
+            template.cestamp
     };
 
 
     console.log(
         "PROJECT TEMPLATE REFERENCE:"
     );
+
 
     console.log(
         JSON.stringify(
@@ -655,17 +980,20 @@ function createProjectRequest(
     /*
      * Create project payload
      */
+
     var payload = {
 
         data: [
 
             {
 
-                type: "Project Space",
+                type:
+                    "Project Space",
 
                 dataelements: {
 
-                    constraintDate: "",
+                    constraintDate:
+                        "",
 
                     scheduleFrom:
                         "Project Start Date",
@@ -704,28 +1032,34 @@ function createProjectRequest(
         "================================="
     );
 
+
     console.log(
         "CREATE PROJECT FROM TEMPLATE"
     );
+
 
     console.log(
         "Template ID:",
         template.id
     );
 
+
     console.log(
         "Template Type:",
         template.type
     );
+
 
     console.log(
         "Template Cestamp:",
         template.cestamp
     );
 
+
     console.log(
         "Payload:"
     );
+
 
     console.log(
         JSON.stringify(
@@ -734,6 +1068,7 @@ function createProjectRequest(
             2
         )
     );
+
 
     console.log(
         "================================="
@@ -755,9 +1090,11 @@ function createProjectRequest(
         projectUrl,
         {
 
-            method: "POST",
+            method:
+                "POST",
 
-            type: "json",
+            type:
+                "json",
 
             headers: {
 
@@ -774,57 +1111,114 @@ function createProjectRequest(
             data:
                 JSON.stringify(payload),
 
-            onComplete: function (response) {
 
-                console.log(
-                    "================================="
-                );
+            onComplete:
+                function (response) {
 
-                console.log(
-                    "PROJECT CREATED FROM TEMPLATE"
-                );
+                    console.log(
+                        "================================="
+                    );
 
-                console.log(response);
 
-                console.log(
-                    "================================="
-                );
+                    console.log(
+                        "PROJECT CREATED FROM TEMPLATE"
+                    );
 
-                showSuccess(
-                    "Project Created Successfully From Template"
-                );
 
-            },
+                    console.log(response);
 
-            onFailure: function (error) {
 
-                console.log(
-                    "================================="
-                );
+                    console.log(
+                        "================================="
+                    );
 
-                console.log(
-                    "PROJECT CREATION FAILED"
-                );
 
-                console.log(error);
+                    /*
+                     * Re-enable Create button.
+                     */
 
-                console.log(
-                    "================================="
-                );
+                    resetCreateButton();
 
-                showError(
-                    "PROJECT CREATION FAILED: " +
-                    (
-                        error && error.message
-                            ? error.message
-                            : "400 Bad Request"
-                    )
-                );
 
-            }
+                    /*
+                     * Show final success message.
+                     */
+
+                    showSuccess(
+                        "Project Created Successfully From Template"
+                    );
+
+                },
+
+
+            onFailure:
+                function (error) {
+
+                    console.log(
+                        "================================="
+                    );
+
+
+                    console.log(
+                        "PROJECT CREATION FAILED"
+                    );
+
+
+                    console.log(error);
+
+
+                    console.log(
+                        "================================="
+                    );
+
+
+                    /*
+                     * Re-enable Create button.
+                     */
+
+                    resetCreateButton();
+
+
+                    showError(
+                        "PROJECT CREATION FAILED: " +
+                        (
+                            error &&
+                            error.message
+                                ? error.message
+                                : "400 Bad Request"
+                        )
+                    );
+
+                }
 
         }
     );
+}
+
+
+
+/*
+ * RESET CREATE BUTTON
+ */
+
+function resetCreateButton() {
+
+    var createButton =
+        document.getElementById(
+            "createBtn"
+        );
+
+
+    if (!createButton) {
+        return;
+    }
+
+
+    createButton.disabled = false;
+
+
+    createButton.innerHTML =
+        "Create Project";
 }
 
 
@@ -841,6 +1235,11 @@ function showSuccess(message) {
         );
 
 
+    if (!result) {
+        return;
+    }
+
+
     result.className =
         "success";
 
@@ -848,6 +1247,7 @@ function showSuccess(message) {
     result.innerHTML =
         message;
 }
+
 
 
 /*
@@ -862,6 +1262,11 @@ function showError(message) {
         );
 
 
+    if (!result) {
+        return;
+    }
+
+
     result.className =
         "error";
 
@@ -869,6 +1274,7 @@ function showError(message) {
     result.innerHTML =
         message;
 }
+
 
 
 /*
@@ -881,6 +1287,11 @@ function showInfo(message) {
         document.getElementById(
             "result"
         );
+
+
+    if (!result) {
+        return;
+    }
 
 
     result.className =
