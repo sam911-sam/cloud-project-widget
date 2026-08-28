@@ -379,13 +379,10 @@ function searchProjectTemplates(
 function populateTemplates(response) {
 
     var select =
-        document.getElementById(
-            "projectTemplate"
-        );
+        document.getElementById("projectTemplate");
 
-
-    select.innerHTML = "";
-
+    select.innerHTML =
+        '<option value="">Select Project Template</option>';
 
     if (
         !response ||
@@ -396,23 +393,17 @@ function populateTemplates(response) {
         select.innerHTML =
             '<option value="">No templates found</option>';
 
-        showError(
-            "No project templates found."
-        );
+        showError("No project templates found.");
 
         return;
     }
 
+    console.log("ALL SEARCH RESULTS:");
+ console.log(
+    "SELECTED/ALL TEMPLATE DATA:",
+    JSON.stringify(response.data, null, 2)
+);
 
-    console.log(
-        "ALL SEARCH RESULTS:",
-        response.data
-    );
-
-
-    /*
-     * Filter Project Template objects
-     */
 
     var projectTemplates =
         response.data.filter(function (template) {
@@ -421,151 +412,79 @@ function populateTemplates(response) {
                 "Template:",
                 template.id,
                 "Type:",
-                template.type
+                template.type,
+                "Title:",
+                template.dataelements &&
+                template.dataelements.title
             );
 
-            return (
-                template.type ===
-                "Project Template"
-            );
-
+            return template.type === "Project Template";
         });
 
-
-    /*
-     * If API returns objects with a different
-     * type, temporarily show all objects.
-     *
-     * This is useful for checking your actual
-     * 3DEXPERIENCE response.
-     */
-
-    if (projectTemplates.length === 0) {
-
-        console.log(
-            "No objects with type 'Project Template'."
-        );
-
-        console.log(
-            "Using returned objects directly."
-        );
-
-        projectTemplates =
-            response.data;
-    }
-
+    console.log(
+        "FILTERED PROJECT TEMPLATES:",
+        projectTemplates
+    );
 
     if (projectTemplates.length === 0) {
 
         select.innerHTML =
-            '<option value="">No templates found</option>';
+            '<option value="">No Project Template objects found</option>';
 
         showError(
-            "No project templates found."
+            "Search returned objects, but none are Project Template type."
         );
 
         return;
     }
 
+    projectTemplates.forEach(function (template) {
 
-    /*
-     * Default option
-     */
+        var option =
+            document.createElement("option");
 
-    var defaultOption =
-        document.createElement("option");
+        option.value = template.id;
 
-    defaultOption.value = "";
+        var title = "";
 
-    defaultOption.text =
-        "Select Project Template";
+        if (
+            template.dataelements &&
+            template.dataelements.title
+        ) {
 
-    select.appendChild(
-        defaultOption
-    );
+            title =
+                template.dataelements.title;
 
+        } else if (
+            template.dataelements &&
+            template.dataelements.name
+        ) {
 
-    /*
-     * Add templates
-     */
+            title =
+                template.dataelements.name;
 
-    projectTemplates.forEach(
-        function (template) {
+        } else {
 
-            var option =
-                document.createElement("option");
-
-
-            /*
-             * IMPORTANT:
-             * Actual object ID from API
-             */
-
-            option.value =
+            title =
                 template.id;
-
-
-            /*
-             * Get display name
-             */
-
-            var title = "";
-
-
-            if (
-                template.dataelements &&
-                template.dataelements.title
-            ) {
-
-                title =
-                    template.dataelements.title;
-
-            } else if (
-                template.dataelements &&
-                template.dataelements.name
-            ) {
-
-                title =
-                    template.dataelements.name;
-
-            } else {
-
-                title =
-                    template.id;
-            }
-
-
-            option.text =
-                title;
-
-
-            /*
-             * Keep original object
-             */
-
-            option.templateObject =
-                template;
-
-
-            select.appendChild(
-                option
-            );
-
         }
-    );
 
+        option.text = title;
+
+        /*
+         * Store the complete API object.
+         */
+        option.templateObject = template;
+
+        select.appendChild(option);
+    });
 
     console.log(
         "Project Templates loaded:",
         projectTemplates.length
     );
-
-
-    showSuccess(
-        projectTemplates.length +
-        " template(s) found."
-    );
 }
+
 
 
 /*
@@ -675,11 +594,67 @@ function createProjectRequest(
     description
 ) {
 
+    var select =
+        document.getElementById("projectTemplate");
+
+    var selectedOption =
+        select.options[select.selectedIndex];
+
+    var template =
+        selectedOption.templateObject;
+
+    console.log("=================================");
+    console.log("SELECTED TEMPLATE OBJECT");
+    console.log(template);
+    console.log("=================================");
+
+    if (!template) {
+
+        showError(
+            "Selected template information is not available."
+        );
+
+        return;
+    }
 
     /*
-     * PAYLOAD FROM YOUR API
+     * Build the project template reference
+     * according to the API schema.
      */
+    var templateReference = {
 
+        id: template.id,
+
+        type: template.type,
+
+        identifier: template.id,
+
+        source: spaceUrl,
+
+        relativePath:
+            "/resources/v1/modeler/projecttemplates/" +
+            template.id,
+
+        cestamp: template.cestamp
+    };
+
+
+    console.log(
+        "PROJECT TEMPLATE REFERENCE:"
+    );
+
+    console.log(
+        JSON.stringify(
+            templateReference,
+            null,
+            2
+        )
+    );
+
+
+    /*
+     * Create project payload
+     */
     var payload = {
 
         data: [
@@ -706,22 +681,13 @@ function createProjectRequest(
 
                     description:
                         description
-
                 },
 
                 relateddata: {
 
                     projectTemplate: [
 
-                        {
-
-                            id:
-                                templateId,
-
-                            type:
-                                "Project Template"
-
-                        }
+                        templateReference
 
                     ]
 
@@ -735,7 +701,7 @@ function createProjectRequest(
 
 
     console.log(
-        "================================"
+        "================================="
     );
 
     console.log(
@@ -744,17 +710,17 @@ function createProjectRequest(
 
     console.log(
         "Template ID:",
-        templateId
+        template.id
     );
 
     console.log(
-        "Project Name:",
-        projectName
+        "Template Type:",
+        template.type
     );
 
     console.log(
-        "Description:",
-        description
+        "Template Cestamp:",
+        template.cestamp
     );
 
     console.log(
@@ -770,13 +736,9 @@ function createProjectRequest(
     );
 
     console.log(
-        "================================"
+        "================================="
     );
 
-
-    /*
-     * POST ENDPOINT
-     */
 
     var projectUrl =
         spaceUrl +
@@ -807,14 +769,16 @@ function createProjectRequest(
 
                 "ENO_CSRF_TOKEN":
                     csrfToken
-
             },
 
             data:
                 JSON.stringify(payload),
 
-
             onComplete: function (response) {
+
+                console.log(
+                    "================================="
+                );
 
                 console.log(
                     "PROJECT CREATED FROM TEMPLATE"
@@ -822,28 +786,21 @@ function createProjectRequest(
 
                 console.log(response);
 
+                console.log(
+                    "================================="
+                );
 
                 showSuccess(
                     "Project Created Successfully From Template"
                 );
 
-
-                /*
-                 * Clear fields
-                 */
-
-                document.getElementById(
-                    "projectName"
-                ).value = "";
-
-                document.getElementById(
-                    "projectDescription"
-                ).value = "";
-
             },
 
-
             onFailure: function (error) {
+
+                console.log(
+                    "================================="
+                );
 
                 console.log(
                     "PROJECT CREATION FAILED"
@@ -851,38 +808,25 @@ function createProjectRequest(
 
                 console.log(error);
 
-
-                var message =
-                    "PROJECT CREATION FAILED";
-
-
-                if (error) {
-
-                    if (error.message) {
-
-                        message +=
-                            ": " +
-                            error.message;
-
-                    } else if (
-                        typeof error === "string"
-                    ) {
-
-                        message +=
-                            ": " +
-                            error;
-                    }
-                }
-
+                console.log(
+                    "================================="
+                );
 
                 showError(
-                    message
+                    "PROJECT CREATION FAILED: " +
+                    (
+                        error && error.message
+                            ? error.message
+                            : "400 Bad Request"
+                    )
                 );
+
             }
 
         }
     );
 }
+
 
 
 /*
